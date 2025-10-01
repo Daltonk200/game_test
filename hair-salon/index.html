@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hair Salon</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Welcome to the Hair Salon!</h1>
+    
+    <div class="game-container">
+        <!-- Background image -->
+        <img src="assets/background.png" alt="Salon Background" class="background-image">
+        
+        <!-- Table image -->
+        <img src="assets/table.png" alt="Table" class="table-image">
+        
+        <!-- Avatar image -->
+        <img src="assets/avatar.png" alt="Avatar" class="avatar-image">
+        
+        <!-- Hair canvas for drawing/styling -->
+        <canvas id="hairCanvas"></canvas>
+        
+        <!-- Audio elements -->
+        <audio id="paintSound" preload="auto">
+            <source src="assets/paint.mp3" type="audio/mpeg">
+            <source src="assets/paint.wav" type="audio/wav">
+        </audio>
+        <audio id="combSound" preload="auto">
+            <source src="assets/comb.mp3" type="audio/mpeg">
+            <source src="assets/comb.wav" type="audio/wav">
+        </audio>
+        <audio id="shaveSound" preload="auto">
+            <source src="assets/shave.mp3" type="audio/mpeg">
+            <source src="assets/shave.wav" type="audio/wav">
+        </audio>
+        <audio id="backgroundMusic" preload="auto" loop>
+            <source src="assets/comedy-funny-cartoon-background-music-390026.mp3" type="audio/mpeg">
+            <source src="assets/background-music.wav" type="audio/wav">
+        </audio>
+        
+        <!-- Controls panel -->
+        <div class="controls-panel">
+            <button id="shaveBtn">Shave</button>
+            <button id="combBtn">Comb</button>
+            <button id="paintBtn">Paint</button>
+            <input type="color" id="hairColor" value="#8B4513">
+            <button id="screenshotBtn">Screenshot</button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
