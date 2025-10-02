@@ -18,8 +18,45 @@ let hairStrands = []; // Store all hair strands for combing
 let lastMouseX = 0;
 let lastMouseY = 0;
 
+// Function to draw hair zone guide (semi-circle)
+function drawHairZoneGuide() {
+    const centerX = 305;  // Avatar head center X
+    const centerY = 220;  // Avatar head center Y
+    const hairRadius = 90; // Maximum hair radius
+    
+    ctx.strokeStyle = 'rgba(32, 201, 151, 0.3)'; // Teal color with transparency
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]); // Dashed line
+    
+    ctx.beginPath();
+    // Draw semi-circle: start from left (-π) to right (0), which is the top half
+    ctx.arc(centerX, centerY, hairRadius, Math.PI, 2 * Math.PI);
+    // Add a straight line across the bottom to close the semi-circle
+    ctx.lineTo(centerX - hairRadius, centerY);
+    ctx.stroke();
+    
+    ctx.setLineDash([]); // Reset line dash
+}
+
+// Function to clear hair zone guide
+function clearHairZoneGuide() {
+    // Clear the canvas and redraw all hair strands
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Redraw all hair strands
+    for (let i = 0; i < hairStrands.length; i++) {
+        const strand = hairStrands[i];
+        drawHairStrand(strand.baseX, strand.baseY, strand.angle, strand.length, strand.color);
+    }
+}
+
 // Function to change current tool
 function setTool(newTool) {
+    // Clear any existing guide when switching tools
+    if (tool === 'addHair') {
+        clearHairZoneGuide();
+    }
+    
     tool = newTool;
     console.log('Tool changed to:', tool);
     
@@ -39,6 +76,7 @@ function setTool(newTool) {
             break;
         case 'addHair':
             canvas.classList.add('cursor-addhair');
+            // No longer show guide automatically
             break;
     }
 }
@@ -134,8 +172,28 @@ function shave(x, y) {
     ctx.clearRect(x - 15, y - 15, 30, 30);
 }
 
+// Function to check if position is within the hair zone (semi-circle)
+function isInHairZone(x, y) {
+    const centerX = 305;  // Avatar head center X
+    const centerY = 220;  // Avatar head center Y
+    const hairRadius = 90; // Maximum hair radius
+    
+    // Calculate distance from center
+    const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+    
+    // Check if within radius AND in the top half (y <= centerY)
+    return distance <= hairRadius && y <= centerY;
+}
+
 // Function to add new hair strands at a specific position
 function addHair(x, y, color) {
+    // Check if position is within the hair zone
+    if (!isInHairZone(x, y)) {
+        // Show visual feedback for invalid area
+        showInvalidAreaFeedback(x, y);
+        return; // Don't add hair outside the zone
+    }
+    
     // Draw 5 hair strands at the position
     for (let i = 0; i < 5; i++) {
         // Random angle (0 to 360 degrees)
@@ -156,6 +214,67 @@ function addHair(x, y, color) {
         // Draw the hair strand
         drawHairStrand(x, y, angle, length, color);
     }
+}
+
+// Function to show blinking hair zone boundary when invalid placement is attempted
+function showBlinkingHairZone() {
+    let blinkCount = 0;
+    const maxBlinks = 4; // Number of times to blink (4 blinks = 8 total draws)
+    
+    const blinkInterval = setInterval(() => {
+        if (blinkCount % 2 === 0) {
+            // Draw the circle (visible)
+            drawHairZoneGuide();
+        } else {
+            // Clear and redraw hair (invisible circle)
+            clearHairZoneGuide();
+        }
+        
+        blinkCount++;
+        
+        // Stop blinking after max blinks
+        if (blinkCount >= maxBlinks * 2) {
+            clearInterval(blinkInterval);
+            // Ensure we end with the circle hidden
+            clearHairZoneGuide();
+        }
+    }, 200); // Blink every 200ms
+}
+
+// Function to show visual feedback for invalid hair placement
+function showInvalidAreaFeedback(x, y) {
+    // Show blinking hair zone boundary
+    showBlinkingHairZone();
+    
+    // Also draw a red X at the attempted position
+    ctx.strokeStyle = '#ff4444';
+    ctx.lineWidth = 3;
+    ctx.globalAlpha = 0.8;
+    
+    ctx.beginPath();
+    // Draw X
+    ctx.moveTo(x - 10, y - 10);
+    ctx.lineTo(x + 10, y + 10);
+    ctx.moveTo(x + 10, y - 10);
+    ctx.lineTo(x - 10, y + 10);
+    ctx.stroke();
+    
+    ctx.globalAlpha = 1.0; // Reset alpha
+    
+    // Remove the X after a short delay
+    setTimeout(() => {
+        // Clear the area around the X
+        ctx.clearRect(x - 15, y - 15, 30, 30);
+        
+        // Redraw any hair strands that might have been in that area
+        for (let i = 0; i < hairStrands.length; i++) {
+            const strand = hairStrands[i];
+            const distance = Math.sqrt(Math.pow(strand.baseX - x, 2) + Math.pow(strand.baseY - y, 2));
+            if (distance <= 20) {
+                drawHairStrand(strand.baseX, strand.baseY, strand.angle, strand.length, strand.color);
+            }
+        }
+    }, 800); // Keep X visible a bit longer than the blinking
 }
 
 // Function to paint/recolor existing hair strands at a specific position
@@ -287,14 +406,18 @@ canvas.addEventListener('mousedown', function(e) {
             paintHair(e.offsetX, e.offsetY, currentColor);
             break;
         case 'addHair':
-            if (audioElements.paintSound) {
-                audioElements.paintSound.currentTime = 0;
-                audioElements.paintSound.loop = true;
-                audioElements.paintSound.play();
-            }
             // Use the dedicated addHair function to add new hair strands
             const addColor = colorPicker.value;
             addHair(e.offsetX, e.offsetY, addColor);
+            
+            // Only play sound if hair was actually added (inside the zone)
+            if (isInHairZone(e.offsetX, e.offsetY)) {
+                if (audioElements.paintSound) {
+                    audioElements.paintSound.currentTime = 0;
+                    audioElements.paintSound.loop = true;
+                    audioElements.paintSound.play();
+                }
+            }
             break;
         case 'comb':
             if (audioElements.combSound) {
