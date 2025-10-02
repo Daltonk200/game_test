@@ -86,7 +86,7 @@ function generateHair() {
             const length = 25;
             
             // Draw the hair strand
-            drawHairStrand(baseX, baseY, strandAngle, length, "#000");
+            drawHairStrand(baseX, baseY, strandAngle, length, "#8B4513");
         }
     }
     
@@ -101,7 +101,7 @@ function generateHair() {
         const strandAngle = angle + (Math.random() - 0.5) * 0.4;
         const length = 25;
         
-        drawHairStrand(baseX, baseY, strandAngle, length, "#000");
+        drawHairStrand(baseX, baseY, strandAngle, length, "#8B4513");
     }
 }
 
