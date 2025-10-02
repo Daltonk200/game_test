@@ -63,6 +63,60 @@ h1 {
     pointer-events: auto;
 }
 
+/* Sound toggle button in top left */
+.sound-toggle-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 12px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #6c757d, #495057);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    z-index: 10;
+}
+
+.sound-toggle-btn:hover {
+    background: linear-gradient(145deg, #495057, #343a40);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(108, 117, 125, 0.4);
+}
+
+.sound-toggle-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
+}
+
+.sound-toggle-btn svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+    transition: transform 0.2s ease;
+}
+
+.sound-toggle-btn:hover svg {
+    transform: scale(1.1);
+}
+
+/* Muted state styling */
+.sound-toggle-btn.muted {
+    background: linear-gradient(145deg, #dc3545, #c82333);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.sound-toggle-btn.muted:hover {
+    background: linear-gradient(145deg, #c82333, #a71e2a);
+    box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+}
+
 .controls-panel {
     position: absolute;
     top: 10px;
@@ -224,4 +278,30 @@ h1 {
 
 .cursor-addhair {
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23000" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>') 12 12, auto;
+}
+
+/* Active tool styling */
+.controls-panel button.active-tool {
+    background: linear-gradient(145deg, #ffd700, #ffb700) !important;
+    box-shadow: 0 6px 12px rgba(255, 215, 0, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+.controls-panel button.active-tool svg {
+    color: #333;
+    transform: scale(1.1);
+}
+
+/* Pulse animation for screenshot feedback */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Shake animation for errors */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
 }
