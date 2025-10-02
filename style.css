@@ -35,17 +35,17 @@ h1 {
 
 .table-image {
     position: absolute;
-    bottom: 4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 320px;
+    bottom: -340px;
+    right: -50px;
+    width: 695px;
     height: auto;
     z-index: 2;
+    overflow: hidden;
 }
 
 .avatar-image {
     position: absolute;
-    bottom: 120px;
+    bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
     width: 680px;

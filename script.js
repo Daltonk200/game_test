@@ -55,43 +55,51 @@ function drawHairStrand(x, y, angle, length, color) {
 
 // Function to generate hair around the avatar's head
 function generateHair() {
-    const centerX = 300;  // Avatar head center X
-    const centerY = 200;  // Avatar head center Y
+    const centerX = 305;  // Avatar head center X
+    const centerY = 220;  // Avatar head center Y
+    const maxRadius = 70; // Maximum hair radius (reduced by half)
     
-    // Generate hair strands from center outward to eliminate gaps
-    for (let i = 0; i < 400; i++) {
-        // Pick a random angle
-        const baseAngle = Math.random() * 2 * Math.PI;
+    // Create structured hair in concentric circles for more control
+    for (let radius = 0; radius <= maxRadius; radius += 3) {
+        // Number of strands for this circle (even more strands for compact density)
+        const strandsInCircle = Math.max(16, Math.floor(radius * 2.5));
         
-        // Use distances starting from very close to center (0) to outer edge
-        const distance = Math.random() * 100; // 0 to 100 pixels from center
-        
-        // Calculate base position - can be anywhere from center to edge
-        const baseX = centerX + Math.cos(baseAngle) * distance;
-        const baseY = centerY + Math.sin(baseAngle) * distance;
-        
-        // Hair strands point outward from center with some randomness
-        const strandAngle = baseAngle + (Math.random() - 0.5) * (Math.PI / 3);
-        
-        // Random strand length
-        const length = 25 + Math.random() * 35;
-        
-        // Draw the hair strand
-        drawHairStrand(baseX, baseY, strandAngle, length, "#000");
+        for (let i = 0; i < strandsInCircle; i++) {
+            // Evenly distribute angles around semi-circle (top half only)
+            const baseAngle = (i / strandsInCircle) * Math.PI - Math.PI; // -180° to 0° (top half)
+            
+            // Add small variation to avoid perfect grid
+            const angleVariation = (Math.random() - 0.5) * 0.1;
+            const radiusVariation = (Math.random() - 0.5) * 2;
+            
+            // Calculate position
+            const actualRadius = radius + radiusVariation;
+            const actualAngle = baseAngle + angleVariation;
+            
+            const baseX = centerX + Math.cos(actualAngle) * actualRadius;
+            const baseY = centerY + Math.sin(actualAngle) * actualRadius;
+            
+            // Hair strands point outward from center
+            const strandAngle = actualAngle + (Math.random() - 0.5) * 0.5;
+            
+            // Consistent length
+            const length = 25;
+            
+            // Draw the hair strand
+            drawHairStrand(baseX, baseY, strandAngle, length, "#000");
+        }
     }
     
-    // Add extra dense hair in the center area to fill any remaining gaps
-    for (let i = 0; i < 100; i++) {
-        // Focus on center area (within 40 pixels of center)
-        const centerAngle = Math.random() * 2 * Math.PI;
-        const centerDistance = Math.random() * 40;
+    // Add very dense center fill with controlled placement (semi-circle)
+    for (let i = 0; i < 24; i++) {
+        const angle = (i / 24) * Math.PI - Math.PI; // -180° to 0° (top half only)
+        const distance = 1 + (Math.random() * 4);
         
-        const baseX = centerX + Math.cos(centerAngle) * centerDistance;
-        const baseY = centerY + Math.sin(centerAngle) * centerDistance;
+        const baseX = centerX + Math.cos(angle) * distance;
+        const baseY = centerY + Math.sin(angle) * distance;
         
-        // Short strands pointing in random directions
-        const strandAngle = Math.random() * 2 * Math.PI;
-        const length = 15 + Math.random() * 25;
+        const strandAngle = angle + (Math.random() - 0.5) * 0.4;
+        const length = 25;
         
         drawHairStrand(baseX, baseY, strandAngle, length, "#000");
     }
