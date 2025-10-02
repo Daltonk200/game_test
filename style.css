@@ -79,15 +79,110 @@ h1 {
 }
 
 .controls-panel button {
-    padding: 8px 12px;
+    padding: 12px;
     border: none;
-    border-radius: 6px;
-    background: #007bff;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #007bff, #0056b3);
     color: white;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background 0.2s ease;
+    transition: all 0.3s ease;
+    min-width: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.controls-panel button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.controls-panel button:hover::before {
+    left: 100%;
+}
+
+.controls-panel button svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+    transition: transform 0.2s ease;
+    z-index: 1;
+}
+
+.controls-panel button:hover {
+    background: linear-gradient(145deg, #0056b3, #004494);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
+}
+
+.controls-panel button:hover svg {
+    transform: scale(1.1);
+}
+
+.controls-panel button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+/* Individual button styling */
+#shaveBtn {
+    background: linear-gradient(145deg, #dc3545, #c82333);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+#shaveBtn:hover {
+    background: linear-gradient(145deg, #c82333, #a71e2a);
+    box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+}
+
+#combBtn {
+    background: linear-gradient(145deg, #28a745, #218838);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+#combBtn:hover {
+    background: linear-gradient(145deg, #218838, #1e7e34);
+    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
+}
+
+#paintBtn {
+    background: linear-gradient(145deg, #fd7e14, #e8590c);
+    box-shadow: 0 4px 8px rgba(253, 126, 20, 0.3);
+}
+
+#paintBtn:hover {
+    background: linear-gradient(145deg, #e8590c, #d54d09);
+    box-shadow: 0 6px 12px rgba(253, 126, 20, 0.4);
+}
+
+#screenshotBtn {
+    background: linear-gradient(145deg, #6f42c1, #5a32a3);
+    box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+}
+
+#screenshotBtn:hover {
+    background: linear-gradient(145deg, #5a32a3, #4a2c85);
+    box-shadow: 0 6px 12px rgba(111, 66, 193, 0.4);
+}
+
+#addHairBtn {
+    background: linear-gradient(145deg, #20c997, #17a085);
+    box-shadow: 0 4px 8px rgba(32, 201, 151, 0.3);
+}
+
+#addHairBtn:hover {
+    background: linear-gradient(145deg, #17a085, #138973);
+    box-shadow: 0 6px 12px rgba(32, 201, 151, 0.4);
 }
 
 .controls-panel button:hover {
@@ -99,12 +194,19 @@ h1 {
 }
 
 #hairColor {
-    width: 100%;
-    height: 35px;
-    border: 2px solid #ddd;
-    border-radius: 6px;
+    width: 48px;
+    height: 48px;
+    border: 3px solid #fff;
+    border-radius: 8px;
     cursor: pointer;
     padding: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+#hairColor:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Custom cursor styles for different tools */
@@ -118,4 +220,8 @@ h1 {
 
 .cursor-shave {
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23000" d="M22 4.73L19.27 2L17 4.27l2.73 2.73L22 4.73M15.73 7L17 5.73L18.27 7L17 8.27L15.73 7M8.5 10.5L5 14l1.5 1.5l3.5-3.5L8.5 10.5M12 12L9 15l1.5 1.5l3-3L12 12M15.5 15.5L12 19l1.5 1.5l3.5-3.5L15.5 15.5z"/></svg>') 12 12, auto;
+}
+
+.cursor-addhair {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23000" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>') 12 12, auto;
 }

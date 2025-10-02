@@ -24,7 +24,7 @@ function setTool(newTool) {
     console.log('Tool changed to:', tool);
     
     // Remove all cursor classes
-    canvas.classList.remove('cursor-paint', 'cursor-comb', 'cursor-shave');
+    canvas.classList.remove('cursor-paint', 'cursor-comb', 'cursor-shave', 'cursor-addhair');
     
     // Add appropriate cursor class
     switch(tool) {
@@ -36,6 +36,9 @@ function setTool(newTool) {
             break;
         case 'shave':
             canvas.classList.add('cursor-shave');
+            break;
+        case 'addHair':
+            canvas.classList.add('cursor-addhair');
             break;
     }
 }
@@ -131,8 +134,8 @@ function shave(x, y) {
     ctx.clearRect(x - 15, y - 15, 30, 30);
 }
 
-// Function to paint hair at a specific position
-function paintHair(x, y, color) {
+// Function to add new hair strands at a specific position
+function addHair(x, y, color) {
     // Draw 5 hair strands at the position
     for (let i = 0; i < 5; i++) {
         // Random angle (0 to 360 degrees)
@@ -152,6 +155,37 @@ function paintHair(x, y, color) {
         
         // Draw the hair strand
         drawHairStrand(x, y, angle, length, color);
+    }
+}
+
+// Function to paint/recolor existing hair strands at a specific position
+function paintHair(x, y, color) {
+    let foundHair = false;
+    
+    // Look for existing hair strands within 30px of the cursor
+    for (let i = 0; i < hairStrands.length; i++) {
+        const strand = hairStrands[i];
+        const distance = Math.sqrt(
+            Math.pow(strand.baseX - x, 2) + Math.pow(strand.baseY - y, 2)
+        );
+        
+        // If strand is within range, change its color
+        if (distance <= 30) {
+            strand.color = color;
+            foundHair = true;
+        }
+    }
+    
+    // If we found hair to recolor, redraw the entire canvas
+    if (foundHair) {
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Redraw all hair strands with updated colors
+        for (let i = 0; i < hairStrands.length; i++) {
+            const strand = hairStrands[i];
+            drawHairStrand(strand.baseX, strand.baseY, strand.angle, strand.length, strand.color);
+        }
     }
 }
 
@@ -248,9 +282,19 @@ canvas.addEventListener('mousedown', function(e) {
                 audioElements.paintSound.loop = true;
                 audioElements.paintSound.play();
             }
-            // Use the dedicated paintHair function
+            // Use the dedicated paintHair function to recolor existing hair
             const currentColor = colorPicker.value;
             paintHair(e.offsetX, e.offsetY, currentColor);
+            break;
+        case 'addHair':
+            if (audioElements.paintSound) {
+                audioElements.paintSound.currentTime = 0;
+                audioElements.paintSound.loop = true;
+                audioElements.paintSound.play();
+            }
+            // Use the dedicated addHair function to add new hair strands
+            const addColor = colorPicker.value;
+            addHair(e.offsetX, e.offsetY, addColor);
             break;
         case 'comb':
             if (audioElements.combSound) {
@@ -281,6 +325,10 @@ canvas.addEventListener('mousemove', function(e) {
             case 'paint':
                 const currentColor = colorPicker.value;
                 paintHair(e.offsetX, e.offsetY, currentColor);
+                break;
+            case 'addHair':
+                const addColor = colorPicker.value;
+                addHair(e.offsetX, e.offsetY, addColor);
                 break;
             case 'comb':
                 // Calculate mouse movement direction
@@ -421,5 +469,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('shaveBtn').addEventListener('click', () => setTool('shave'));
     document.getElementById('combBtn').addEventListener('click', () => setTool('comb'));
     document.getElementById('paintBtn').addEventListener('click', () => setTool('paint'));
+    document.getElementById('addHairBtn').addEventListener('click', () => setTool('addHair'));
     document.getElementById('screenshotBtn').addEventListener('click', takeScreenshot);
 });

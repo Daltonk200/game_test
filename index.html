@@ -42,11 +42,32 @@
         
         <!-- Controls panel -->
         <div class="controls-panel">
-            <button id="shaveBtn">Shave</button>
-            <button id="combBtn">Comb</button>
-            <button id="paintBtn">Paint</button>
-            <input type="color" id="hairColor" value="#8B4513">
-            <button id="screenshotBtn">Screenshot</button>
+            <button id="shaveBtn" title="Shave">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36c-.5-.23-1.05-.36-1.64-.36-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64zM6 8c-1.1 0-2-.89-2-2s.89-2 2-2 2 .89 2 2-.89 2-2 2zm0 12c-1.1 0-2-.89-2-2s.89-2 2-2 2 .89 2 2-.89 2-2 2zm6-7.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5zM19 3l-6 6 2 2 7-7V3h-3z"/>
+                </svg>
+            </button>
+            <button id="combBtn" title="Comb">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 2v4H6V2h2m2 0v4h-1V2h1m2 0v4h-1V2h1m2 0v4h-1V2h1m2 0v4h-1V2h1m2 0v4h-1V2h1M6 8v14h12V8H6z"/>
+                </svg>
+            </button>
+            <button id="paintBtn" title="Paint">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/>
+                </svg>
+            </button>
+            <button id="addHairBtn" title="Add Hair">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+            </button>
+            <input type="color" id="hairColor" value="#8B4513" title="Hair Color">
+            <button id="screenshotBtn" title="Screenshot">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 15.2l3.2-2.7L17 14V6H7v8l1.8-1.5L12 15.2zM9 19h6v-2H9v2zm6.5-6c-.83 0-1.5-.67-1.5-1.5S14.67 10 15.5 10s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM4 4h16v16H4V4z"/>
+                </svg>
+            </button>
         </div>
     </div>
     
