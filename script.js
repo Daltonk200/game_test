@@ -14,6 +14,9 @@ let tool = 'paint';
 let isMouseDown = false;
 let colorPicker;
 let audioElements = {};
+let hairStrands = []; // Store all hair strands for combing
+let lastMouseX = 0;
+let lastMouseY = 0;
 
 // Function to change current tool
 function setTool(newTool) {
@@ -85,6 +88,15 @@ function generateHair() {
             // Consistent length
             const length = 25;
             
+            // Store the strand in the array
+            hairStrands.push({
+                baseX: baseX,
+                baseY: baseY,
+                angle: strandAngle,
+                length: length,
+                color: "#8B4513"
+            });
+            
             // Draw the hair strand
             drawHairStrand(baseX, baseY, strandAngle, length, "#8B4513");
         }
@@ -100,6 +112,15 @@ function generateHair() {
         
         const strandAngle = angle + (Math.random() - 0.5) * 0.4;
         const length = 25;
+        
+        // Store the strand in the array
+        hairStrands.push({
+            baseX: baseX,
+            baseY: baseY,
+            angle: strandAngle,
+            length: length,
+            color: "#8B4513"
+        });
         
         drawHairStrand(baseX, baseY, strandAngle, length, "#8B4513");
     }
@@ -120,8 +141,45 @@ function paintHair(x, y, color) {
         // Random length between 20 and 30 pixels
         const length = 20 + Math.random() * 10;
         
+        // Store the strand in the array
+        hairStrands.push({
+            baseX: x,
+            baseY: y,
+            angle: angle,
+            length: length,
+            color: color
+        });
+        
         // Draw the hair strand
         drawHairStrand(x, y, angle, length, color);
+    }
+}
+
+// Function to comb hair strands dynamically
+function combStrands(x, y, dx, dy) {
+    // Calculate the combing direction
+    const combAngle = Math.atan2(dy, dx);
+    
+    // Clear the canvas area around the comb position
+    ctx.clearRect(x - 30, y - 30, 60, 60);
+    
+    // Loop through all hair strands
+    for (let i = 0; i < hairStrands.length; i++) {
+        const strand = hairStrands[i];
+        
+        // Check if strand is within 50px of comb position
+        const distance = Math.sqrt(
+            Math.pow(strand.baseX - x, 2) + Math.pow(strand.baseY - y, 2)
+        );
+        
+        if (distance <= 50) {
+            // Adjust the strand angle slightly toward the comb direction
+            const angleDiff = combAngle - strand.angle;
+            strand.angle += angleDiff * 0.3; // 30% influence
+        }
+        
+        // Redraw the strand with potentially updated angle
+        drawHairStrand(strand.baseX, strand.baseY, strand.angle, strand.length, strand.color);
     }
 }
 
@@ -225,13 +283,26 @@ canvas.addEventListener('mousemove', function(e) {
                 paintHair(e.offsetX, e.offsetY, currentColor);
                 break;
             case 'comb':
-                comb(e.offsetX, e.offsetY);
+                // Calculate mouse movement direction
+                const dx = e.offsetX - lastMouseX;
+                const dy = e.offsetY - lastMouseY;
+                
+                // Use dynamic strand combing if there's movement
+                if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+                    combStrands(e.offsetX, e.offsetY, dx, dy);
+                } else {
+                    comb(e.offsetX, e.offsetY);
+                }
                 break;
             case 'shave':
                 shave(e.offsetX, e.offsetY);
                 break;
         }
     }
+    
+    // Update last mouse position
+    lastMouseX = e.offsetX;
+    lastMouseY = e.offsetY;
 });
 
 // Function to stop all tool sounds
