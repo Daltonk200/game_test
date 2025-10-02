@@ -37,97 +37,6 @@ function setTool(newTool) {
     }
 }
 
-// Function to draw a hair strand
-function drawHairStrand(x, y, angle, length, color) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    
-    // Calculate end point using angle and length
-    const endX = x + Math.cos(angle) * length;
-    const endY = y + Math.sin(angle) * length;
-    
-    ctx.lineTo(endX, endY);
-    ctx.stroke();
-}
-
-// Function to generate hair around the avatar's head
-function generateHair() {
-    const centerX = 300;  // Avatar head center X
-    const centerY = 200;  // Avatar head center Y
-    
-    // Generate hair strands from center outward to eliminate gaps
-    for (let i = 0; i < 400; i++) {
-        // Pick a random angle
-        const baseAngle = Math.random() * 2 * Math.PI;
-        
-        // Use distances starting from very close to center (0) to outer edge
-        const distance = Math.random() * 100; // 0 to 100 pixels from center
-        
-        // Calculate base position - can be anywhere from center to edge
-        const baseX = centerX + Math.cos(baseAngle) * distance;
-        const baseY = centerY + Math.sin(baseAngle) * distance;
-        
-        // Hair strands point outward from center with some randomness
-        const strandAngle = baseAngle + (Math.random() - 0.5) * (Math.PI / 3);
-        
-        // Random strand length
-        const length = 25 + Math.random() * 35;
-        
-        // Draw the hair strand
-        drawHairStrand(baseX, baseY, strandAngle, length, "#000");
-    }
-    
-    // Add extra dense hair in the center area to fill any remaining gaps
-    for (let i = 0; i < 100; i++) {
-        // Focus on center area (within 40 pixels of center)
-        const centerAngle = Math.random() * 2 * Math.PI;
-        const centerDistance = Math.random() * 40;
-        
-        const baseX = centerX + Math.cos(centerAngle) * centerDistance;
-        const baseY = centerY + Math.sin(centerAngle) * centerDistance;
-        
-        // Short strands pointing in random directions
-        const strandAngle = Math.random() * 2 * Math.PI;
-        const length = 15 + Math.random() * 25;
-        
-        drawHairStrand(baseX, baseY, strandAngle, length, "#000");
-    }
-}
-
-// Function to shave hair at a specific position
-function shave(x, y) {
-    ctx.clearRect(x - 15, y - 15, 30, 30);
-}
-
-// Function to paint hair at a specific position
-function paintHair(x, y, color) {
-    // Draw 5 hair strands at the position
-    for (let i = 0; i < 5; i++) {
-        // Random angle (0 to 360 degrees)
-        const angle = Math.random() * 2 * Math.PI;
-        
-        // Random length between 20 and 30 pixels
-        const length = 20 + Math.random() * 10;
-        
-        // Draw the hair strand
-        drawHairStrand(x, y, angle, length, color);
-    }
-}
-
-// Function to comb hair at a specific position
-function comb(x, y) {
-    ctx.strokeStyle = "rgba(0,0,0,0.1)";
-    ctx.lineWidth = 2;
-    
-    ctx.beginPath();
-    ctx.moveTo(x - 15, y);
-    ctx.lineTo(x + 15, y);
-    ctx.stroke();
-}
-
 // Get mouse position relative to canvas
 function getMousePos(canvas, e) {
     const rect = canvas.getBoundingClientRect();
@@ -182,9 +91,6 @@ canvas.addEventListener('mousedown', function(e) {
                 audioElements.paintSound.loop = true;
                 audioElements.paintSound.play();
             }
-            // Use the dedicated paintHair function
-            const currentColor = colorPicker.value;
-            paintHair(e.offsetX, e.offsetY, currentColor);
             break;
         case 'comb':
             if (audioElements.combSound) {
@@ -192,7 +98,6 @@ canvas.addEventListener('mousedown', function(e) {
                 audioElements.combSound.loop = true;
                 audioElements.combSound.play();
             }
-            comb(e.offsetX, e.offsetY);
             break;
         case 'shave':
             if (audioElements.shaveSound) {
@@ -200,29 +105,17 @@ canvas.addEventListener('mousedown', function(e) {
                 audioElements.shaveSound.loop = true;
                 audioElements.shaveSound.play();
             }
-            // Use the dedicated shave function
-            shave(e.offsetX, e.offsetY);
             break;
     }
+    
+    paint(pos.x, pos.y);
 });
 
 // Mouse move event - continue painting if mouse is down
 canvas.addEventListener('mousemove', function(e) {
     if (isMouseDown) {
         const pos = getMousePos(canvas, e);
-        
-        switch(tool) {
-            case 'paint':
-                const currentColor = colorPicker.value;
-                paintHair(e.offsetX, e.offsetY, currentColor);
-                break;
-            case 'comb':
-                comb(e.offsetX, e.offsetY);
-                break;
-            case 'shave':
-                shave(e.offsetX, e.offsetY);
-                break;
-        }
+        paint(pos.x, pos.y);
     }
 });
 
@@ -256,38 +149,38 @@ canvas.addEventListener('mouseleave', function(e) {
 
 // Function to take screenshot
 function takeScreenshot() {
-    // Create a temporary canvas with the same size as the main canvas
+    // Create a temporary canvas to combine all layers
     const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
     const tempCtx = tempCanvas.getContext('2d');
-
-    // Draw background image
+    tempCanvas.width = 600;
+    tempCanvas.height = 600;
+    
+    // Draw background image if it exists
     const bgImg = document.querySelector('.background-image');
-    if (bgImg && bgImg.complete) {
-        tempCtx.drawImage(bgImg, 0, 0, tempCanvas.width, tempCanvas.height);
+    if (bgImg.complete) {
+        tempCtx.drawImage(bgImg, 0, 0, 600, 600);
     }
-
-    // Draw table image
+    
+    // Draw table image if it exists
     const tableImg = document.querySelector('.table-image');
-    if (tableImg && tableImg.complete) {
+    if (tableImg.complete) {
         const tableWidth = 320;
         const tableHeight = (tableImg.naturalHeight / tableImg.naturalWidth) * tableWidth;
-        tempCtx.drawImage(tableImg, (tempCanvas.width - tableWidth) / 2, tempCanvas.height - tableHeight - 4, tableWidth, tableHeight);
+        tempCtx.drawImage(tableImg, (600 - tableWidth) / 2, 600 - tableHeight - 4, tableWidth, tableHeight);
     }
-
-    // Draw avatar image
+    
+    // Draw avatar image if it exists
     const avatarImg = document.querySelector('.avatar-image');
-    if (avatarImg && avatarImg.complete) {
+    if (avatarImg.complete) {
         const avatarWidth = 680;
         const avatarHeight = (avatarImg.naturalHeight / avatarImg.naturalWidth) * avatarWidth;
-        tempCtx.drawImage(avatarImg, (tempCanvas.width - avatarWidth) / 2, tempCanvas.height - avatarHeight - 120, avatarWidth, avatarHeight);
+        tempCtx.drawImage(avatarImg, (600 - avatarWidth) / 2, 600 - avatarHeight - 120, avatarWidth, avatarHeight);
     }
-
+    
     // Draw the hair canvas on top
     tempCtx.drawImage(canvas, 0, 0);
-
-    // Export as PNG and trigger download
+    
+    // Convert to data URL and download
     const dataURL = tempCanvas.toDataURL('image/png');
     const link = document.createElement('a');
     link.download = 'hair-salon-screenshot.png';
@@ -295,9 +188,60 @@ function takeScreenshot() {
     link.click();
 }
 
-// Function to generate initial hair (removed - using generateHair() instead)
+// Function to generate initial hair
 function generateInitialHair() {
-    // This function is now empty - hair generation handled by generateHair()
+    // Avatar head center (approximate position based on CSS styling)
+    const headCenterX = 300; // Center of 600px canvas
+    const headCenterY = 250; // Approximate head position
+    const headRadius = 80;   // Approximate head radius
+    
+    // Hair colors array for variety
+    const hairColors = ['#8B4513', '#654321', '#2F1B14', '#D2691E', '#A0522D', '#8B7355'];
+    
+    // Generate random hair blobs only on top and sides of head
+    for (let i = 0; i < 60; i++) {
+        // Generate random angle only for top half and sides of head (from -π to 0)
+        const angle = Math.random() * Math.PI - Math.PI; // -180° to 0° (top half of circle)
+        
+        // Generate random distance from head center (slightly outside head radius)
+        const distance = headRadius + Math.random() * 25;
+        
+        // Calculate position
+        const x = headCenterX + Math.cos(angle) * distance;
+        const y = headCenterY + Math.sin(angle) * distance;
+        
+        // Random hair color
+        const hairColor = hairColors[Math.floor(Math.random() * hairColors.length)];
+        
+        // Random blob size
+        const blobSize = 4 + Math.random() * 8;
+        
+        // Draw hair blob
+        ctx.fillStyle = hairColor;
+        ctx.beginPath();
+        ctx.arc(x, y, blobSize, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+    
+    // Add some additional hair strands for more natural look (only on head area)
+    for (let i = 0; i < 20; i++) {
+        // Limit angle to top and sides of head
+        const angle = Math.random() * Math.PI - Math.PI; // -180° to 0°
+        const distance = headRadius + Math.random() * 35;
+        const x = headCenterX + Math.cos(angle) * distance;
+        const y = headCenterY + Math.sin(angle) * distance;
+        
+        const hairColor = hairColors[Math.floor(Math.random() * hairColors.length)];
+        
+        ctx.strokeStyle = hairColor;
+        ctx.lineWidth = 2 + Math.random() * 3;
+        ctx.globalAlpha = 0.7;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + (Math.random() - 0.5) * 20, y + (Math.random() - 0.5) * 20);
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
+    }
 }
 
 // Connect buttons to functions
@@ -334,9 +278,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Generate initial hair on page load
     generateInitialHair();
-    
-    // Generate hair strands
-    generateHair();
     
     // Connect tool buttons
     document.getElementById('shaveBtn').addEventListener('click', () => setTool('shave'));
