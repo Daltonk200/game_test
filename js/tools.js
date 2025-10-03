@@ -4,12 +4,13 @@
  */
 
 class ToolManager {
-    constructor(canvas, ctx, hairSystem, physicsEngine, audioManager) {
+    constructor(canvas, ctx, hairSystem, physicsEngine, audioManager, characterManager) {
         this.canvas = canvas;
         this.ctx = ctx;
         this.hairSystem = hairSystem;
         this.physicsEngine = physicsEngine;
         this.audioManager = audioManager;
+        this.characterManager = characterManager;
         
         this.currentTool = 'paint';
         this.isMouseDown = false;
@@ -186,16 +187,15 @@ class ToolManager {
     }
 
     /**
-     * Add new hair strands
+     * Add hair at position
      * @param {number} x - X coordinate
      * @param {number} y - Y coordinate
      * @param {string} color - Hair color
      * @param {boolean} playSound - Whether to start/continue sound
      */
     addHair(x, y, color, playSound = false) {
-        const success = this.hairSystem.addHairAtPosition(x, y, color);
-        
-        if (success) {
+        const currentCharacter = this.characterManager.getCurrentCharacter().id;
+        const success = this.hairSystem.addHairAtPosition(x, y, color, currentCharacter);        if (success) {
             if (playSound) {
                 this.audioManager.playToolSound('paint', true); // Use paint sound for add hair
             }

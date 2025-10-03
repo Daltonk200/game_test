@@ -104,6 +104,41 @@ const GameConfig = {
     // Animation Settings
     animation: {
         fps: 60  // Using requestAnimationFrame, but good to document target
+    },
+
+    // Character Settings
+    characters: {
+        male: {
+            name: 'Male',
+            image: 'assets/avatar.png',
+            hairCenter: { x: 305, y: 220 },
+            hairRadius: 90,
+            hairStyle: {
+                defaultColor: "#8B4513", // Brown
+                strandLength: { min: 20, max: 30 },
+                generationRadius: { step: 3, maxRadius: 70 },
+                strandsPerCircle: { base: 16, multiplier: 2.5 },
+                centerFillStrands: 24,
+                curliness: 0, // Straight hair
+                volumeMultiplier: 1.0
+            }
+        },
+        female: {
+            name: 'Female',
+            image: 'assets/avatar_female.png',
+            hairCenter: { x: 305, y: 210 },
+            hairRadius: 85,
+            hairStyle: {
+                defaultColor: "#D2691E", // Lighter brown/auburn
+                strandLength: { min: 25, max: 40 }, // Longer hair
+                generationRadius: { step: 3, maxRadius: 75 }, // Slightly wider
+                strandsPerCircle: { base: 20, multiplier: 3.0 }, // More density
+                centerFillStrands: 30, // More center strands
+                curliness: 0.15, // Slight wave
+                volumeMultiplier: 1.2 // More volume
+            }
+        },
+        default: 'male'
     }
 };
 

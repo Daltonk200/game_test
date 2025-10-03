@@ -51,6 +51,20 @@ h1 {
     width: 680px;
     height: auto;
     z-index: 3;
+    transition: all 0.3s ease;
+}
+
+/* Character-specific avatar positioning */
+.avatar-image.male {
+    bottom: 100px;
+    width: 680px;
+    transform: translateX(-50%);
+}
+
+.avatar-image.female {
+    bottom: 90px;  /* Adjust this value based on female avatar */
+    width: 320px;  /* Adjust this value based on female avatar size */
+    transform: translateX(-50%);
 }
 
 #hairCanvas {
@@ -115,6 +129,79 @@ h1 {
 .sound-toggle-btn.muted:hover {
     background: linear-gradient(145deg, #c82333, #a71e2a);
     box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+}
+
+/* Character selector in top left (below sound button) */
+.character-selector {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 12px;
+    border-radius: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.character-toggle-btn {
+    padding: 8px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #007bff, #0056b3);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+}
+
+.character-toggle-btn:hover {
+    background: linear-gradient(145deg, #0056b3, #004494);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+}
+
+.character-toggle-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.character-toggle-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    transition: transform 0.2s ease;
+}
+
+.character-toggle-btn:hover svg {
+    transform: scale(1.1);
+}
+
+.character-label {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    min-width: 45px;
+    text-align: center;
+}
+
+/* Female character styling */
+.character-selector.female .character-toggle-btn {
+    background: linear-gradient(145deg, #e91e63, #c2185b);
+    box-shadow: 0 2px 6px rgba(233, 30, 99, 0.3);
+}
+
+.character-selector.female .character-toggle-btn:hover {
+    background: linear-gradient(145deg, #c2185b, #ad1457);
+    box-shadow: 0 4px 8px rgba(233, 30, 99, 0.4);
 }
 
 .controls-panel {

@@ -4,9 +4,10 @@
  */
 
 class UIController {
-    constructor(toolManager, audioManager) {
+    constructor(toolManager, audioManager, characterManager = null) {
         this.toolManager = toolManager;
         this.audioManager = audioManager;
+        this.characterManager = characterManager;
         this.colorPicker = null;
         this.buttons = {};
         
@@ -332,6 +333,12 @@ class UIController {
                 case 'm': // M for mute/unmute background music
                     event.preventDefault();
                     this.toggleBackgroundMusic();
+                    break;
+                case 'x': // X for character switch
+                    event.preventDefault();
+                    if (this.characterManager) {
+                        this.characterManager.toggleCharacter();
+                    }
                     break;
             }
         });

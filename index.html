@@ -20,6 +20,16 @@
             </svg>
         </button>
         
+        <!-- Character selector -->
+        <div class="character-selector">
+            <button id="characterToggleBtn" class="character-toggle-btn" title="Switch Character">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </button>
+            <span id="characterLabel" class="character-label">Male</span>
+        </div>
+        
         <!-- Background image -->
         <img src="assets/background.png" alt="Salon Background" class="background-image">
         
@@ -27,7 +37,7 @@
         <img src="assets/table.png" alt="Table" class="table-image">
         
         <!-- Avatar image -->
-        <img src="assets/avatar.png" alt="Avatar" class="avatar-image">
+        <img id="avatarImage" src="assets/avatar.png" alt="Avatar" class="avatar-image">
         
         <!-- Hair canvas for drawing/styling -->
         <canvas id="hairCanvas"></canvas>
@@ -87,6 +97,7 @@
     <script src="js/hair-system.js"></script>
     <script src="js/physics.js"></script>
     <script src="js/audio-manager.js"></script>
+    <script src="js/character-manager.js"></script>
     <script src="js/tools.js"></script>
     <script src="js/ui-controls.js"></script>
     <script src="js/game.js"></script>

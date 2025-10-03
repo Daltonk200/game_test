@@ -35,19 +35,21 @@ class HairSystem {
 
     /**
      * Generate initial hair around the avatar's head
+     * @param {string} characterType - The character type ('male' or 'female')
      */
-    generateHair() {
-        const centerX = GameConfig.avatar.centerX;
-        const centerY = GameConfig.avatar.centerY;
-        const maxRadius = GameConfig.hair.generationRadius.maxRadius;
-        const step = GameConfig.hair.generationRadius.step;
+    generateHair(characterType = 'male') {
+        const character = GameConfig.characters[characterType];
+        const centerX = character.hairCenter.x;
+        const centerY = character.hairCenter.y;
+        const maxRadius = character.hairStyle.generationRadius.maxRadius;
+        const step = character.hairStyle.generationRadius.step;
         
         // Create structured hair in concentric circles for more control
         for (let radius = 0; radius <= maxRadius; radius += step) {
             // Number of strands for this circle
             const strandsInCircle = Math.max(
-                GameConfig.hair.strandsPerCircle.base, 
-                Math.floor(radius * GameConfig.hair.strandsPerCircle.multiplier)
+                character.hairStyle.strandsPerCircle.base, 
+                Math.floor(radius * character.hairStyle.strandsPerCircle.multiplier * character.hairStyle.volumeMultiplier)
             );
             
             for (let i = 0; i < strandsInCircle; i++) {
@@ -65,19 +67,22 @@ class HairSystem {
                 const baseX = centerX + Math.cos(actualAngle) * actualRadius;
                 const baseY = centerY + Math.sin(actualAngle) * actualRadius;
                 
-                // Hair strands point outward from center
-                const strandAngle = actualAngle + (Math.random() - 0.5) * 0.5;
+                // Hair strands point outward from center with character-specific curliness
+                const strandAngle = actualAngle + (Math.random() - 0.5) * (0.5 + character.hairStyle.curliness);
                 
-                // Consistent length
-                const length = GameConfig.hair.strandLength.max;
+                // Character-specific length
+                const length = Utils.randomBetween(
+                    character.hairStyle.strandLength.min,
+                    character.hairStyle.strandLength.max
+                );
                 
                 // Store and draw the strand
-                this.addHairStrand(baseX, baseY, strandAngle, length, GameConfig.hair.defaultColor);
+                this.addHairStrand(baseX, baseY, strandAngle, length, character.hairStyle.defaultColor);
             }
         }
         
         // Add very dense center fill with controlled placement (semi-circle)
-        const centerFillStrands = GameConfig.hair.centerFillStrands;
+        const centerFillStrands = character.hairStyle.centerFillStrands;
         for (let i = 0; i < centerFillStrands; i++) {
             const angle = (i / centerFillStrands) * Math.PI - Math.PI; // -180° to 0° (top half only)
             const distance = 1 + (Math.random() * 4);
@@ -85,11 +90,11 @@ class HairSystem {
             const baseX = centerX + Math.cos(angle) * distance;
             const baseY = centerY + Math.sin(angle) * distance;
             
-            const strandAngle = angle + (Math.random() - 0.5) * 0.4;
-            const length = GameConfig.hair.strandLength.max;
+            const strandAngle = angle + (Math.random() - 0.5) * (0.4 + character.hairStyle.curliness);
+            const length = character.hairStyle.strandLength.max;
             
             // Store and draw the strand
-            this.addHairStrand(baseX, baseY, strandAngle, length, GameConfig.hair.defaultColor);
+            this.addHairStrand(baseX, baseY, strandAngle, length, character.hairStyle.defaultColor);
         }
     }
 
@@ -119,24 +124,27 @@ class HairSystem {
      * @param {number} x - X coordinate
      * @param {number} y - Y coordinate
      * @param {string} color - Color of the hair strands
+     * @param {string} characterType - The character type for styling
      */
-    addHairAtPosition(x, y, color) {
+    addHairAtPosition(x, y, color, characterType = 'male') {
         // Check if position is within the hair zone
         if (!Utils.isInHairZone(x, y)) {
             return false; // Return false if outside valid area
         }
         
+        const character = GameConfig.characters[characterType];
         const strandsToAdd = GameConfig.tools.addHair.strandsPerClick;
         
         // Draw multiple hair strands at the position
         for (let i = 0; i < strandsToAdd; i++) {
-            // Random angle (0 to 360 degrees)
-            const angle = Math.random() * 2 * Math.PI;
+            // Random angle (0 to 360 degrees) with character-specific curliness
+            const baseAngle = Math.random() * 2 * Math.PI;
+            const angle = baseAngle + (Math.random() - 0.5) * character.hairStyle.curliness;
             
-            // Random length
+            // Character-specific length
             const length = Utils.randomBetween(
-                GameConfig.hair.strandLength.min, 
-                GameConfig.hair.strandLength.max
+                character.hairStyle.strandLength.min, 
+                character.hairStyle.strandLength.max
             );
             
             this.addHairStrand(x, y, angle, length, color);

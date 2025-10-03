@@ -15,6 +15,7 @@ class HairSalonGame {
         this.audioManager = null;
         this.toolManager = null;
         this.uiController = null;
+        this.characterManager = null;
         
         console.log('Hair Salon Game created');
     }
@@ -82,17 +83,25 @@ class HairSalonGame {
         // Initialize Physics Engine
         this.physicsEngine = new PhysicsEngine(this.canvas, this.ctx);
         
+        // Initialize Character Manager (depends on hair and physics systems)
+        this.characterManager = new CharacterManager(this.hairSystem, this.physicsEngine);
+        this.characterManager.initialize();
+        
+        // Preload character images
+        this.characterManager.preloadCharacterImages();
+        
         // Initialize Tool Manager (depends on other systems)
         this.toolManager = new ToolManager(
             this.canvas, 
             this.ctx, 
             this.hairSystem, 
             this.physicsEngine, 
-            this.audioManager
+            this.audioManager,
+            this.characterManager
         );
         
         // Initialize UI Controller (depends on tool manager and audio manager)
-        this.uiController = new UIController(this.toolManager, this.audioManager);
+        this.uiController = new UIController(this.toolManager, this.audioManager, this.characterManager);
         
         console.log('All game systems initialized');
     }
@@ -115,7 +124,8 @@ class HairSalonGame {
      */
     generateInitialHair() {
         console.log('Generating initial hair...');
-        this.hairSystem.generateHair();
+        const defaultCharacter = GameConfig.characters.default;
+        this.hairSystem.generateHair(defaultCharacter);
         console.log(`Initial hair generated: ${this.hairSystem.getHairCount()} strands`);
     }
 
@@ -161,6 +171,7 @@ class HairSalonGame {
             hairCount: this.hairSystem.getHairCount(),
             fallingHairCount: this.physicsEngine.getFallingHairCount(),
             currentTool: this.toolManager.getCurrentTool(),
+            currentCharacter: this.characterManager.getCurrentCharacter(),
             audioStatus: this.audioManager.getAudioStatus(),
             uiState: this.uiController.getUIState()
         };
@@ -248,6 +259,10 @@ class HairSalonGame {
             this.uiController.cleanup();
         }
         
+        if (this.characterManager) {
+            this.characterManager.cleanup();
+        }
+        
         // Clear canvas
         if (this.ctx) {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -279,7 +294,8 @@ class HairSalonGame {
                 physicsEngine: !!this.physicsEngine,
                 audioManager: !!this.audioManager,
                 toolManager: !!this.toolManager,
-                uiController: !!this.uiController
+                uiController: !!this.uiController,
+                characterManager: !!this.characterManager
             }
         };
     }
