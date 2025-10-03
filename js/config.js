@@ -120,7 +120,11 @@ const GameConfig = {
                 strandsPerCircle: { base: 16, multiplier: 2.5 },
                 centerFillStrands: 24,
                 curliness: 0, // Straight hair
-                volumeMultiplier: 1.0
+                volumeMultiplier: 1.0,
+                wavePattern: 'straight', // straight, wavy, curly
+                waveAmplitude: 0, // How pronounced the waves are
+                waveFrequency: 0, // How often waves occur
+                layering: 1.0 // Hair layering effect
             }
         },
         female: {
@@ -134,8 +138,12 @@ const GameConfig = {
                 generationRadius: { step: 3, maxRadius: 75 }, // Slightly wider
                 strandsPerCircle: { base: 20, multiplier: 3.0 }, // More density
                 centerFillStrands: 30, // More center strands
-                curliness: 0.15, // Slight wave
-                volumeMultiplier: 1.2 // More volume
+                curliness: 0.3, // More pronounced wave
+                volumeMultiplier: 1.2, // More volume
+                wavePattern: 'curly', // straight, wavy, curly
+                waveAmplitude: 6, // How pronounced the waves are (pixels)
+                waveFrequency: 0.8, // How often waves occur along strand
+                layering: 1.3 // More layered look
             }
         },
         default: 'male'
