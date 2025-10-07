@@ -124,7 +124,12 @@ const GameConfig = {
                 wavePattern: 'straight', // straight, wavy, curly
                 waveAmplitude: 0, // How pronounced the waves are
                 waveFrequency: 0, // How often waves occur
-                layering: 1.0 // Hair layering effect
+                layering: 1.0, // Hair layering effect
+                glossiness: 0.3, // How shiny the hair appears (0-1)
+                highlightColor: "#A0522D", // Highlight color for shine
+                shadowColor: "#654321", // Shadow color for depth
+                layerDepths: [1.0, 0.8, 0.6], // Different layer depths for volume
+                volumeVariation: 0.2 // Random volume variation
             }
         },
         female: {
@@ -143,7 +148,12 @@ const GameConfig = {
                 wavePattern: 'curly', // straight, wavy, curly
                 waveAmplitude: 6, // How pronounced the waves are (pixels)
                 waveFrequency: 0.8, // How often waves occur along strand
-                layering: 1.3 // More layered look
+                layering: 1.3, // More layered look
+                glossiness: 0.6, // More shiny for female hair
+                highlightColor: "#F4A460", // Sandy brown highlights
+                shadowColor: "#8B4513", // Darker brown shadows
+                layerDepths: [1.0, 0.7, 0.4], // More dramatic layering
+                volumeVariation: 0.4 // More volume variation
             }
         },
         default: 'male'
