@@ -188,12 +188,25 @@ class UIController {
             return;
         }
 
+        // Hide the color picker during screenshot
+        const colorPicker = document.getElementById('hairColor');
+        const originalVisibility = colorPicker ? colorPicker.style.visibility : '';
+        
+        if (colorPicker) {
+            colorPicker.style.visibility = 'hidden';
+        }
+
         html2canvas(gameContainer, {
             allowTaint: true,
             useCORS: true,
             backgroundColor: '#f5f5f5',
             scale: 1
         }).then(canvas => {
+            // Show color picker again
+            if (colorPicker) {
+                colorPicker.style.visibility = originalVisibility;
+            }
+            
             // Export as PNG and trigger download
             const dataURL = canvas.toDataURL('image/png');
             const link = document.createElement('a');
@@ -204,6 +217,11 @@ class UIController {
             // Show success feedback
             this.showScreenshotFeedback(true);
         }).catch(error => {
+            // Show color picker again on error
+            if (colorPicker) {
+                colorPicker.style.visibility = originalVisibility;
+            }
+            
             console.error('html2canvas screenshot failed:', error);
             // Fall back to manual method
             this.takeScreenshotManual();
@@ -211,9 +229,59 @@ class UIController {
     }
 
     /**
+     * Draw color swatch on the captured canvas
+     * @param {HTMLCanvasElement} canvas - The captured canvas
+     * @param {HTMLElement} gameContainer - Game container element
+     */
+    drawColorSwatchOnCanvas(canvas, gameContainer) {
+        const colorPicker = document.getElementById('hairColor');
+        if (!colorPicker) return;
+        
+        const ctx = canvas.getContext('2d');
+        const containerRect = gameContainer.getBoundingClientRect();
+        const pickerRect = colorPicker.getBoundingClientRect();
+        
+        const pickerX = pickerRect.left - containerRect.left;
+        const pickerY = pickerRect.top - containerRect.top;
+        const pickerWidth = pickerRect.width;
+        const pickerHeight = pickerRect.height;
+        
+        // Add roundRect polyfill
+        this.addRoundRectPolyfill(ctx);
+        
+        ctx.save();
+        
+        // Draw white border
+        ctx.fillStyle = '#ffffff';
+        ctx.roundRect(pickerX - 3, pickerY - 3, pickerWidth + 6, pickerHeight + 6, 8);
+        ctx.fill();
+        
+        // Draw color swatch
+        ctx.fillStyle = colorPicker.value || '#8B4513';
+        ctx.roundRect(pickerX, pickerY, pickerWidth, pickerHeight, 5);
+        ctx.fill();
+        
+        // Draw subtle border
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.lineWidth = 1;
+        ctx.roundRect(pickerX, pickerY, pickerWidth, pickerHeight, 5);
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+
+    /**
      * Take screenshot manually by drawing elements to canvas
      */
     takeScreenshotManual() {
+        // Hide the color picker during screenshot
+        const colorPicker = document.getElementById('hairColor');
+        const originalVisibility = colorPicker ? colorPicker.style.visibility : '';
+        
+        if (colorPicker) {
+            colorPicker.style.visibility = 'hidden';
+        }
+
         // Get the entire game container
         const gameContainer = document.querySelector('.game-container');
         if (!gameContainer) {
@@ -288,6 +356,11 @@ class UIController {
         // Draw UI elements (controls panel, sound button, character selector)
         this.drawUIElements(tempCtx, gameContainer);
 
+        // Show color picker again
+        if (colorPicker) {
+            colorPicker.style.visibility = originalVisibility;
+        }
+
         // Export as PNG and trigger download
         const dataURL = tempCanvas.toDataURL('image/png');
         const link = document.createElement('a');
@@ -361,6 +434,9 @@ class UIController {
             
             // Restore context
             ctx.restore();
+            
+            // Draw custom color picker (instead of showing the native input)
+            this.drawCustomColorPicker(ctx, gameContainer);
         }
 
         // Draw sound toggle button
@@ -438,6 +514,53 @@ class UIController {
 
         // Add text overlay for UI labels
         this.drawUIText(ctx, gameContainer);
+    }
+
+    /**
+     * Draw custom color picker for screenshots (replaces native input)
+     * @param {CanvasRenderingContext2D} ctx - Canvas context
+     * @param {HTMLElement} gameContainer - Game container element
+     */
+    drawCustomColorPicker(ctx, gameContainer) {
+        const containerRect = gameContainer.getBoundingClientRect();
+        const colorPicker = document.getElementById('hairColor');
+        
+        if (colorPicker) {
+            const pickerRect = colorPicker.getBoundingClientRect();
+            const pickerX = pickerRect.left - containerRect.left;
+            const pickerY = pickerRect.top - containerRect.top;
+            const pickerWidth = pickerRect.width;
+            const pickerHeight = pickerRect.height;
+            
+            ctx.save();
+            
+            // Draw shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 4;
+            
+            // Draw white border
+            ctx.fillStyle = '#ffffff';
+            ctx.roundRect(pickerX - 3, pickerY - 3, pickerWidth + 6, pickerHeight + 6, 8);
+            ctx.fill();
+            
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            
+            // Draw color swatch
+            ctx.fillStyle = colorPicker.value || '#8B4513';
+            ctx.roundRect(pickerX, pickerY, pickerWidth, pickerHeight, 5);
+            ctx.fill();
+            
+            // Draw subtle border
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.lineWidth = 1;
+            ctx.roundRect(pickerX, pickerY, pickerWidth, pickerHeight, 5);
+            ctx.stroke();
+            
+            ctx.restore();
+        }
     }
 
     /**
