@@ -218,7 +218,7 @@ Create utility functions (utils.js) for:
 - Performance optimization helpers
 ```
 
-### 12. Advanced Features Integration & Debugging
+### 12. Advanced Features Integration
 
 ```
 Integrate these advanced features across the system:
@@ -229,34 +229,8 @@ Integrate these advanced features across the system:
 - Character-specific hair physics and styling
 - Professional UI with smooth animations and micro-interactions
 - Advanced audio system with contextual sound design
-- Screenshot functionality with color picker hidden during capture
+- Screenshot functionality with proper canvas capture
 - Responsive design for different screen sizes
-
-CRITICAL DEBUGGING FIXES:
-1. Screenshot Color Picker Issue:
-   - Hide color picker with visibility: hidden during screenshot
-   - Restore visibility after screenshot completes
-   - Apply to both html2canvas and manual methods
-
-2. Hair Layer Rendering:
-   - Sort strands by layerDepth (back to front: 0.4, 0.7, 1.0)
-   - Apply opacity based on layer (back layers more transparent)
-   - Use volumeZones for realistic density variation
-
-3. Character-Specific Hair Properties:
-   - Male: straight hair, brown #8B4513, curliness: 0
-   - Female: curly hair, auburn #D2691E, curliness: 0.3, glossiness: 0.6
-   - Pass characterType to generateHair() and addHairAtPosition()
-
-4. Audio Autoplay Handling:
-   - Start audio only after user interaction
-   - Implement separate background music and tool sound controls
-   - Handle audio loading errors gracefully
-
-5. Performance Optimization:
-   - Limit hair strands to reasonable count (1500-2500)
-   - Use requestAnimationFrame for physics animation
-   - Clean up falling hair particles when off-screen
 ```
 
 ---
@@ -288,146 +262,27 @@ CRITICAL DEBUGGING FIXES:
 
 ---
 
-## � Debugging & Development Tips
+## 🚀 Getting Started
 
-### **Common Issues & Solutions:**
+To build this project with an AI assistant:
 
-#### **Screenshot Problems:**
-```
-Issue: Color picker showing hex values in screenshots
-Solution: Hide color picker during screenshot capture
-- Use visibility: hidden instead of display: none
-- Restore visibility after screenshot completes
-- Apply to both html2canvas and manual screenshot methods
-```
+1. **Start with the HTML structure** using prompt #1
+2. **Add CSS styling** using prompt #2  
+3. **Build the configuration system** using prompt #3
+4. **Implement core systems** using prompts #4-11 in order
+5. **Integrate advanced features** using prompt #12
+6. **Test and refine** each component as you build
 
-#### **Hair Rendering Issues:**
-```
-Issue: Hair not appearing or looking weird
-Solution: Check layer depth and wave configuration
-- Ensure layerDepth values are between 0-1
-- Verify character hairStyle properties exist
-- Check canvas context and drawing order
-```
+Each prompt is designed to be self-contained but works together to create a cohesive, professional hair salon game.
 
-#### **Audio Problems:**
-```
-Issue: Sounds not playing or background music stuck
-Solution: Handle browser autoplay restrictions
-- Add user interaction before playing audio
-- Check audio file paths and formats
-- Implement proper error handling for audio loading
-```
+## 🎨 Final Result
 
-#### **Performance Issues:**
-```
-Issue: Game running slowly or lagging
-Solution: Optimize hair rendering and physics
-- Limit number of hair strands (max 1000-2000)
-- Use requestAnimationFrame for smooth animations  
-- Clean up falling hair particles regularly
-```
+The completed game will feature:
+- Beautiful, glossy hair rendering with realistic textures
+- Smooth character switching with unique hair styles
+- Professional salon-themed interface
+- Advanced physics and audio systems
+- Responsive, accessible design
+- Screenshot and sharing capabilities
 
-### **Development Workflow:**
-1. **Build incrementally** - Test each component as you add it
-2. **Use browser dev tools** - Check console for errors
-3. **Test on different browsers** - Ensure compatibility
-4. **Validate file paths** - Check all asset references
-5. **Monitor performance** - Watch for memory leaks
-
-### **Debug Console Commands:**
-```javascript
-// Check game state
-console.log(hairSalonGame.getGameState());
-
-// Check hair count  
-console.log(hairSalonGame.hairSystem.getHairCount());
-
-// Test audio system
-hairSalonGame.audioManager.playBackgroundMusic();
-
-// Check character info
-console.log(hairSalonGame.characterManager.getCurrentCharacter());
-```
-
----
-
-## 🚀 Step-by-Step Build Process
-
-### **Phase 1: Foundation (Prompts 1-3)**
-1. **HTML Structure** → Test basic layout loads
-2. **CSS Styling** → Verify visual appearance  
-3. **Configuration** → Check config object exists
-
-### **Phase 2: Core Systems (Prompts 4-7)**
-4. **Hair System** → Test hair generation works
-5. **Physics Engine** → Verify falling hair animation
-6. **Audio Manager** → Check sounds play correctly
-7. **Character Manager** → Test character switching
-
-### **Phase 3: Interaction (Prompts 8-10)**
-8. **Tools System** → Test each tool individually
-9. **UI Controls** → Verify all buttons work
-10. **Game Engine** → Test complete integration
-
-### **Phase 4: Polish (Prompts 11-12)**
-11. **Utilities** → Add helper functions
-12. **Advanced Features** → Final integration and optimization
-
-### **Testing Checklist:**
-- [ ] Page loads without errors
-- [ ] All buttons respond to clicks
-- [ ] Hair can be painted, cut, combed, and added
-- [ ] Character switching works with different hair styles
-- [ ] Audio plays (background music + tool sounds)
-- [ ] Screenshot captures full game screen
-- [ ] Color picker works without showing hex values
-- [ ] Game works in different browsers
-- [ ] No console errors during normal gameplay
-- [ ] Performance is smooth (60fps)
-
----
-
-## 🎯 Exact Project Structure
-
-This README will help you build **exactly** this hair salon game:
-
-```
-hair-salon-game/
-├── index.html                 # Main game page with all UI elements
-├── style.css                  # Complete styling (395 lines)
-├── README.md                  # This comprehensive guide
-├── js/
-│   ├── config.js             # Game config with character hair styles
-│   ├── utils.js              # Helper functions and utilities  
-│   ├── hair-system.js        # Advanced hair rendering with layers
-│   ├── physics.js            # Falling hair animation system
-│   ├── audio-manager.js      # Background music + tool sounds
-│   ├── character-manager.js  # Male/female character switching
-│   ├── tools.js              # Paint, cut, comb, add hair tools
-│   ├── ui-controls.js        # Button handling + screenshot
-│   └── game.js               # Main game engine coordination
-└── assets/
-    ├── avatar.png            # Male character image
-    ├── avatar_female.png     # Female character image
-    ├── background.png        # Salon background
-    ├── table.png            # Salon table/furniture
-    ├── *.mp3                # Audio files for effects
-    └── background-music.mp3  # Looping background music
-```
-
-## 🎨 Final Result Features
-
-The completed game will have **exactly** these features:
-- **Glossy hair rendering** with highlights, shadows, and smooth curves
-- **Male character**: Straight brown hair, moderate volume
-- **Female character**: Curly auburn hair, high volume and shine  
-- **4 tools**: Paint (change color), Cut (falling physics), Comb (adjust angles), Add Hair
-- **Screenshot system** that captures full screen without color picker hex values
-- **Audio system** with separate background music and tool sound controls
-- **Professional UI** with gradient buttons, hover effects, and smooth animations
-- **Character switching** with instant hair style changes
-- **Keyboard shortcuts** for all major functions
-- **Responsive design** that works on different screen sizes
-
-Perfect for showcasing advanced HTML5 Canvas, JavaScript ES6+, CSS3, and game development skills!
+Perfect for showcasing advanced web development skills and creating an engaging user experience!

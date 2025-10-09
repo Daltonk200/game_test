@@ -343,28 +343,6 @@ h1 {
     padding: 0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background: none;
-    overflow: hidden;
-}
-
-/* Hide any text that might appear in color picker */
-#hairColor::-webkit-color-swatch-wrapper {
-    padding: 0;
-    border: none;
-    border-radius: 5px;
-}
-
-#hairColor::-webkit-color-swatch {
-    border: none;
-    border-radius: 5px;
-}
-
-#hairColor::-moz-color-swatch {
-    border: none;
-    border-radius: 5px;
 }
 
 #hairColor:hover {

@@ -162,53 +162,50 @@ class UIController {
     }
 
     /**
-     * Take a screenshot of the entire game screen
+     * Take a screenshot of the current canvas state
      */
     takeScreenshot() {
         try {
-            // Use html2canvas if available, otherwise fall back to manual method
-            if (typeof html2canvas !== 'undefined') {
-                this.takeScreenshotWithHtml2Canvas();
-            } else {
-                this.takeScreenshotManual();
+            // Get canvas element
+            const canvas = document.getElementById('hairCanvas');
+            if (!canvas) {
+                console.error('Canvas not found for screenshot');
+                return;
             }
-        } catch (error) {
-            console.error('Screenshot failed:', error);
-            this.showScreenshotFeedback(false);
-        }
-    }
 
-    /**
-     * Take screenshot using html2canvas library (if available)
-     */
-    takeScreenshotWithHtml2Canvas() {
-        const gameContainer = document.querySelector('.game-container');
-        if (!gameContainer) {
-            console.error('Game container not found for screenshot');
-            return;
-        }
+            // Create a temporary canvas with the same size as the main canvas
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
 
-        // Hide the color picker during screenshot
-        const colorPicker = document.getElementById('hairColor');
-        const originalVisibility = colorPicker ? colorPicker.style.visibility : '';
-        
-        if (colorPicker) {
-            colorPicker.style.visibility = 'hidden';
-        }
-
-        html2canvas(gameContainer, {
-            allowTaint: true,
-            useCORS: true,
-            backgroundColor: '#f5f5f5',
-            scale: 1
-        }).then(canvas => {
-            // Show color picker again
-            if (colorPicker) {
-                colorPicker.style.visibility = originalVisibility;
+            // Draw background image
+            const bgImg = document.querySelector('.background-image');
+            if (bgImg && bgImg.complete) {
+                tempCtx.drawImage(bgImg, 0, 0, tempCanvas.width, tempCanvas.height);
             }
-            
+
+            // Draw table image
+            const tableImg = document.querySelector('.table-image');
+            if (tableImg && tableImg.complete) {
+                const tableWidth = 320;
+                const tableHeight = (tableImg.naturalHeight / tableImg.naturalWidth) * tableWidth;
+                tempCtx.drawImage(tableImg, (tempCanvas.width - tableWidth) / 2, tempCanvas.height - tableHeight - 4, tableWidth, tableHeight);
+            }
+
+            // Draw avatar image
+            const avatarImg = document.querySelector('.avatar-image');
+            if (avatarImg && avatarImg.complete) {
+                const avatarWidth = 680;
+                const avatarHeight = (avatarImg.naturalHeight / avatarImg.naturalWidth) * avatarWidth;
+                tempCtx.drawImage(avatarImg, (tempCanvas.width - avatarWidth) / 2, tempCanvas.height - avatarHeight - 120, avatarWidth, avatarHeight);
+            }
+
+            // Draw the hair canvas on top
+            tempCtx.drawImage(canvas, 0, 0);
+
             // Export as PNG and trigger download
-            const dataURL = canvas.toDataURL('image/png');
+            const dataURL = tempCanvas.toDataURL('image/png');
             const link = document.createElement('a');
             link.download = `hair-salon-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
             link.href = dataURL;
@@ -216,375 +213,10 @@ class UIController {
 
             // Show success feedback
             this.showScreenshotFeedback(true);
-        }).catch(error => {
-            // Show color picker again on error
-            if (colorPicker) {
-                colorPicker.style.visibility = originalVisibility;
-            }
             
-            console.error('html2canvas screenshot failed:', error);
-            // Fall back to manual method
-            this.takeScreenshotManual();
-        });
-    }
-
-    /**
-     * Draw color swatch on the captured canvas
-     * @param {HTMLCanvasElement} canvas - The captured canvas
-     * @param {HTMLElement} gameContainer - Game container element
-     */
-    drawColorSwatchOnCanvas(canvas, gameContainer) {
-        const colorPicker = document.getElementById('hairColor');
-        if (!colorPicker) return;
-        
-        const ctx = canvas.getContext('2d');
-        const containerRect = gameContainer.getBoundingClientRect();
-        const pickerRect = colorPicker.getBoundingClientRect();
-        
-        const pickerX = pickerRect.left - containerRect.left;
-        const pickerY = pickerRect.top - containerRect.top;
-        const pickerWidth = pickerRect.width;
-        const pickerHeight = pickerRect.height;
-        
-        // Add roundRect polyfill
-        this.addRoundRectPolyfill(ctx);
-        
-        ctx.save();
-        
-        // Draw white border
-        ctx.fillStyle = '#ffffff';
-        ctx.roundRect(pickerX - 3, pickerY - 3, pickerWidth + 6, pickerHeight + 6, 8);
-        ctx.fill();
-        
-        // Draw color swatch
-        ctx.fillStyle = colorPicker.value || '#8B4513';
-        ctx.roundRect(pickerX, pickerY, pickerWidth, pickerHeight, 5);
-        ctx.fill();
-        
-        // Draw subtle border
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-        ctx.lineWidth = 1;
-        ctx.roundRect(pickerX, pickerY, pickerWidth, pickerHeight, 5);
-        ctx.stroke();
-        
-        ctx.restore();
-    }
-
-    /**
-     * Take screenshot manually by drawing elements to canvas
-     */
-    takeScreenshotManual() {
-        // Hide the color picker during screenshot
-        const colorPicker = document.getElementById('hairColor');
-        const originalVisibility = colorPicker ? colorPicker.style.visibility : '';
-        
-        if (colorPicker) {
-            colorPicker.style.visibility = 'hidden';
-        }
-
-        // Get the entire game container
-        const gameContainer = document.querySelector('.game-container');
-        if (!gameContainer) {
-            console.error('Game container not found for screenshot');
-            return;
-        }
-
-        // Get the computed dimensions of the game container
-        const containerRect = gameContainer.getBoundingClientRect();
-        const containerWidth = containerRect.width;
-        const containerHeight = containerRect.height;
-
-        // Create a temporary canvas with the same size as the game container
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = containerWidth;
-        tempCanvas.height = containerHeight;
-        const tempCtx = tempCanvas.getContext('2d');
-
-        // Add roundRect polyfill if not available
-        this.addRoundRectPolyfill(tempCtx);
-
-        // Set background color
-        tempCtx.fillStyle = '#f5f5f5'; // Match body background
-        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-        // Draw background image
-        const bgImg = document.querySelector('.background-image');
-        if (bgImg && bgImg.complete) {
-            tempCtx.drawImage(bgImg, 0, 0, containerWidth, containerHeight);
-        }
-
-        // Draw table image with proper positioning
-        const tableImg = document.querySelector('.table-image');
-        if (tableImg && tableImg.complete) {
-            const tableRect = tableImg.getBoundingClientRect();
-            const containerTopLeft = gameContainer.getBoundingClientRect();
-            
-            const tableX = tableRect.left - containerTopLeft.left;
-            const tableY = tableRect.top - containerTopLeft.top;
-            const tableWidth = tableRect.width;
-            const tableHeight = tableRect.height;
-            
-            tempCtx.drawImage(tableImg, tableX, tableY, tableWidth, tableHeight);
-        }
-
-        // Draw avatar image with proper positioning
-        const avatarImg = document.querySelector('.avatar-image');
-        if (avatarImg && avatarImg.complete) {
-            const avatarRect = avatarImg.getBoundingClientRect();
-            const containerTopLeft = gameContainer.getBoundingClientRect();
-            
-            const avatarX = avatarRect.left - containerTopLeft.left;
-            const avatarY = avatarRect.top - containerTopLeft.top;
-            const avatarWidth = avatarRect.width;
-            const avatarHeight = avatarRect.height;
-            
-            tempCtx.drawImage(avatarImg, avatarX, avatarY, avatarWidth, avatarHeight);
-        }
-
-        // Draw the hair canvas on top
-        const hairCanvas = document.getElementById('hairCanvas');
-        if (hairCanvas) {
-            const canvasRect = hairCanvas.getBoundingClientRect();
-            const containerTopLeft = gameContainer.getBoundingClientRect();
-            
-            const canvasX = canvasRect.left - containerTopLeft.left;
-            const canvasY = canvasRect.top - containerTopLeft.top;
-            
-            tempCtx.drawImage(hairCanvas, canvasX, canvasY);
-        }
-
-        // Draw UI elements (controls panel, sound button, character selector)
-        this.drawUIElements(tempCtx, gameContainer);
-
-        // Show color picker again
-        if (colorPicker) {
-            colorPicker.style.visibility = originalVisibility;
-        }
-
-        // Export as PNG and trigger download
-        const dataURL = tempCanvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.download = `hair-salon-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
-        link.href = dataURL;
-        link.click();
-
-        // Show success feedback
-        this.showScreenshotFeedback(true);
-    }
-
-    /**
-     * Add roundRect polyfill for older browsers
-     * @param {CanvasRenderingContext2D} ctx - Canvas context
-     */
-    addRoundRectPolyfill(ctx) {
-        if (!ctx.roundRect) {
-            ctx.roundRect = function(x, y, width, height, radius) {
-                if (width < 2 * radius) radius = width / 2;
-                if (height < 2 * radius) radius = height / 2;
-                
-                this.beginPath();
-                this.moveTo(x + radius, y);
-                this.arcTo(x + width, y, x + width, y + height, radius);
-                this.arcTo(x + width, y + height, x, y + height, radius);
-                this.arcTo(x, y + height, x, y, radius);
-                this.arcTo(x, y, x + width, y, radius);
-                this.closePath();
-            };
-        }
-    }
-
-    /**
-     * Draw UI elements onto the screenshot canvas
-     * @param {CanvasRenderingContext2D} ctx - Canvas context
-     * @param {HTMLElement} gameContainer - Game container element
-     */
-    drawUIElements(ctx, gameContainer) {
-        const containerRect = gameContainer.getBoundingClientRect();
-
-        // Draw controls panel background
-        const controlsPanel = document.querySelector('.controls-panel');
-        if (controlsPanel) {
-            const panelRect = controlsPanel.getBoundingClientRect();
-            
-            const panelX = panelRect.left - containerRect.left;
-            const panelY = panelRect.top - containerRect.top;
-            const panelWidth = panelRect.width;
-            const panelHeight = panelRect.height;
-            
-            // Save context
-            ctx.save();
-            
-            // Draw panel shadow
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 2;
-            
-            // Draw panel background
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-            ctx.roundRect(panelX, panelY, panelWidth, panelHeight, 8);
-            ctx.fill();
-            
-            // Reset shadow and draw border
-            ctx.shadowColor = 'transparent';
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-            ctx.lineWidth = 1;
-            ctx.roundRect(panelX, panelY, panelWidth, panelHeight, 8);
-            ctx.stroke();
-            
-            // Restore context
-            ctx.restore();
-            
-            // Draw custom color picker (instead of showing the native input)
-            this.drawCustomColorPicker(ctx, gameContainer);
-        }
-
-        // Draw sound toggle button
-        const soundButton = document.querySelector('.sound-toggle-btn');
-        if (soundButton) {
-            const buttonRect = soundButton.getBoundingClientRect();
-            
-            const buttonX = buttonRect.left - containerRect.left;
-            const buttonY = buttonRect.top - containerRect.top;
-            const buttonSize = Math.min(buttonRect.width, buttonRect.height);
-            
-            // Save context
-            ctx.save();
-            
-            // Draw button shadow
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-            ctx.shadowBlur = 8;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 4;
-            
-            // Draw button background
-            const isMuted = soundButton.classList.contains('muted');
-            ctx.fillStyle = isMuted ? '#dc3545' : '#6c757d';
-            ctx.beginPath();
-            ctx.arc(buttonX + buttonSize/2, buttonY + buttonSize/2, buttonSize/2, 0, 2 * Math.PI);
-            ctx.fill();
-            
-            // Restore context
-            ctx.restore();
-        }
-
-        // Draw character selector
-        const characterSelector = document.querySelector('.character-selector');
-        if (characterSelector) {
-            const selectorRect = characterSelector.getBoundingClientRect();
-            
-            const selectorX = selectorRect.left - containerRect.left;
-            const selectorY = selectorRect.top - containerRect.top;
-            const selectorWidth = selectorRect.width;
-            const selectorHeight = selectorRect.height;
-            
-            // Save context
-            ctx.save();
-            
-            // Draw selector shadow
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-            ctx.shadowBlur = 8;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 2;
-            
-            // Draw selector background
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-            ctx.roundRect(selectorX, selectorY, selectorWidth, selectorHeight, 25);
-            ctx.fill();
-            
-            // Draw character toggle button
-            const characterButton = document.querySelector('.character-toggle-btn');
-            if (characterButton) {
-                const charButtonRect = characterButton.getBoundingClientRect();
-                const charButtonX = charButtonRect.left - containerRect.left;
-                const charButtonY = charButtonRect.top - containerRect.top;
-                const charButtonSize = Math.min(charButtonRect.width, charButtonRect.height);
-                
-                // Determine button color based on character
-                const isFemale = characterSelector.classList.contains('female');
-                ctx.fillStyle = isFemale ? '#e91e63' : '#007bff';
-                ctx.beginPath();
-                ctx.arc(charButtonX + charButtonSize/2, charButtonY + charButtonSize/2, charButtonSize/2, 0, 2 * Math.PI);
-                ctx.fill();
-            }
-            
-            // Restore context
-            ctx.restore();
-        }
-
-        // Add text overlay for UI labels
-        this.drawUIText(ctx, gameContainer);
-    }
-
-    /**
-     * Draw custom color picker for screenshots (replaces native input)
-     * @param {CanvasRenderingContext2D} ctx - Canvas context
-     * @param {HTMLElement} gameContainer - Game container element
-     */
-    drawCustomColorPicker(ctx, gameContainer) {
-        const containerRect = gameContainer.getBoundingClientRect();
-        const colorPicker = document.getElementById('hairColor');
-        
-        if (colorPicker) {
-            const pickerRect = colorPicker.getBoundingClientRect();
-            const pickerX = pickerRect.left - containerRect.left;
-            const pickerY = pickerRect.top - containerRect.top;
-            const pickerWidth = pickerRect.width;
-            const pickerHeight = pickerRect.height;
-            
-            ctx.save();
-            
-            // Draw shadow
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-            ctx.shadowBlur = 8;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 4;
-            
-            // Draw white border
-            ctx.fillStyle = '#ffffff';
-            ctx.roundRect(pickerX - 3, pickerY - 3, pickerWidth + 6, pickerHeight + 6, 8);
-            ctx.fill();
-            
-            // Reset shadow
-            ctx.shadowColor = 'transparent';
-            
-            // Draw color swatch
-            ctx.fillStyle = colorPicker.value || '#8B4513';
-            ctx.roundRect(pickerX, pickerY, pickerWidth, pickerHeight, 5);
-            ctx.fill();
-            
-            // Draw subtle border
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-            ctx.lineWidth = 1;
-            ctx.roundRect(pickerX, pickerY, pickerWidth, pickerHeight, 5);
-            ctx.stroke();
-            
-            ctx.restore();
-        }
-    }
-
-    /**
-     * Draw UI text elements
-     * @param {CanvasRenderingContext2D} ctx - Canvas context
-     * @param {HTMLElement} gameContainer - Game container element
-     */
-    drawUIText(ctx, gameContainer) {
-        const containerRect = gameContainer.getBoundingClientRect();
-        
-        // Draw character label
-        const characterLabel = document.getElementById('characterLabel');
-        if (characterLabel) {
-            const labelRect = characterLabel.getBoundingClientRect();
-            const labelX = labelRect.left - containerRect.left;
-            const labelY = labelRect.top - containerRect.top;
-            
-            ctx.save();
-            ctx.fillStyle = '#333';
-            ctx.font = '14px Arial, sans-serif';
-            ctx.fontWeight = '600';
-            ctx.textAlign = 'center';
-            ctx.fillText(characterLabel.textContent, labelX + labelRect.width/2, labelY + labelRect.height/2 + 4);
-            ctx.restore();
+        } catch (error) {
+            console.error('Screenshot failed:', error);
+            this.showScreenshotFeedback(false);
         }
     }
 
