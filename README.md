@@ -165,12 +165,13 @@ Create a comprehensive tool system (tools.js) with these tools:
 - Comb Tool: Adjust hair strand angles with directional influence
 - Shave Tool: Remove hair with physics-based falling animation
 - Add Hair Tool: Add new strands with character-specific styling
-- Screenshot Tool: Capture and download game state
 - Mouse interaction handling (mousedown, mousemove, mouseup)
 - Tool switching with visual feedback
 - Invalid area detection and feedback
 - Integration with audio system for tool sounds
 - Custom cursor styles for each tool
+
+Note: Screenshot functionality is implemented separately in ui-controls.js, not as a tool in the tools system.
 ```
 
 ### 9. UI Controls & User Interface
@@ -180,9 +181,14 @@ Build UI control system (ui-controls.js) for:
 - Button event handling and state management
 - Color picker integration
 - Tool selection with visual active states
-- Sound toggle functionality
+- Sound toggle functionality with mute/unmute states
 - Character switching controls
-- Screenshot functionality with visual feedback
+- Screenshot functionality with multiple capture methods:
+  * Manual canvas composition (creates temporary canvas, draws background image, table image, avatar image, then hair canvas)
+  * HTML2Canvas library integration (if available as fallback)
+  * Automatic file download with timestamped filenames
+  * Visual feedback (pulse animation on success, shake on failure)
+- Keyboard shortcuts (P=paint, C=comb, S=shave, A=add hair, Space=screenshot, M=mute, X=character switch)
 - Loading states and error handling
 - Responsive button layouts
 - Accessibility features (keyboard navigation, screen reader support)
@@ -229,7 +235,13 @@ Integrate these advanced features across the system:
 - Character-specific hair physics and styling
 - Professional UI with smooth animations and micro-interactions
 - Advanced audio system with contextual sound design
-- Screenshot functionality with proper canvas capture
+- Screenshot functionality with layered canvas composition:
+  * Creates temporary canvas matching hair canvas dimensions
+  * Draws background image first (full canvas size)
+  * Draws table image with calculated positioning (320px width, proportional height, centered horizontally, bottom offset)
+  * Draws avatar image with calculated dimensions (680px width, proportional height, centered horizontally, specific vertical offset)
+  * Overlays hair canvas on top
+  * Exports as PNG with timestamped filename and triggers automatic download
 - Responsive design for different screen sizes
 ```
 
@@ -286,3 +298,49 @@ The completed game will feature:
 - Screenshot and sharing capabilities
 
 Perfect for showcasing advanced web development skills and creating an engaging user experience!
+
+---
+
+## 📸 Screenshot System Implementation Details
+
+Based on the current codebase, the screenshot functionality is implemented with the following specific approach:
+
+### Core Implementation (ui-controls.js)
+
+```javascript
+takeScreenshot() {
+    // 1. Get the hair canvas element
+    const canvas = document.getElementById('hairCanvas');
+    
+    // 2. Create temporary canvas with same dimensions as hair canvas
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;  // 600px
+    tempCanvas.height = canvas.height; // 600px
+    
+    // 3. Draw layers in order:
+    //    a) Background image (full canvas size)
+    //    b) Table image (320px width, proportional height, centered, bottom-aligned with 4px offset)
+    //    c) Avatar image (680px width, proportional height, centered, 120px from bottom)
+    //    d) Hair canvas (overlay on top)
+    
+    // 4. Export as PNG with timestamped filename
+    const dataURL = tempCanvas.toDataURL('image/png');
+    const filename = `hair-salon-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+    
+    // 5. Trigger automatic download
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = dataURL;
+    link.click();
+}
+```
+
+### Key Features:
+- **Layer Composition**: Manually composites all visual elements in correct z-order
+- **Precise Positioning**: Each image layer positioned with specific calculations for natural appearance  
+- **Auto-Download**: Creates temporary download link and triggers click for seamless user experience
+- **Error Handling**: Try-catch with visual feedback (pulse animation on success, shake on failure)
+- **Keyboard Support**: Spacebar hotkey for quick screenshot capture
+- **Timestamped Files**: Automatic filename generation with ISO timestamp format
+
+This implementation ensures the screenshot captures the complete game state including background, furniture, character, and styled hair exactly as displayed to the user.
