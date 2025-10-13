@@ -1,0 +1,74 @@
+{
+  "canvas": {
+    "file": "background.png",
+    "width": 600,
+    "height": 600
+  },
+  "items": [
+    {
+      "id": "background",
+      "file": "background.png",
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 600,
+      "z": 1
+    },
+    {
+      "id": "table",
+      "file": "table.png",
+      "x": -50,
+      "y": 940,
+      "width": 695,
+      "height": 400,
+      "z": 2
+    },
+    {
+      "id": "avatar_male",
+      "file": "avatar.png",
+      "x": -40,
+      "y": 400,
+      "width": 680,
+      "height": 400,
+      "z": 3
+    },
+    {
+      "id": "avatar_female",
+      "file": "avatar_female.png",
+      "x": 140,
+      "y": 410,
+      "width": 320,
+      "height": 400,
+      "z": 3
+    },
+    {
+      "id": "hair_canvas",
+      "file": null,
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 600,
+      "z": 4
+    }
+  ],
+  "audio": {
+    "background": [
+      "comedy-funny-cartoon-background-music-390026.mp3",
+      "background-music.mp3"
+    ],
+    "sfx": [
+      {
+        "id": "comb",
+        "file": "comb.mp3"
+      },
+      {
+        "id": "paint",
+        "file": "paint.mp3"
+      },
+      {
+        "id": "shave",
+        "file": "shave.mp3"
+      }
+    ]
+  }
+}

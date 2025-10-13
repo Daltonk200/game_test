@@ -1,0 +1,267 @@
+[
+  {
+    "filename": "audio-manager.js",
+    "purpose": "Handles all sound effects and background music, including loading, playing, pausing, and volume control. It manages audio elements from the DOM and ties them to game events.",
+    "main_functions": [
+      { "name": "AudioManager", "summary": "Class constructor, initializes audio elements and state." },
+      { "name": "initialize", "summary": "Gets audio elements from the DOM and sets their initial volume." },
+      { "name": "playBackgroundMusic", "summary": "Plays the background music if the user has interacted with the page." },
+      { "name": "stopBackgroundMusic", "summary": "Pauses the background music." },
+      { "name": "toggleBackgroundMusic", "summary": "Toggles the mute state of the background music." },
+      { "name": "playToolSound", "summary": "Plays a sound effect for a specific tool (e.g., 'paint', 'comb')." },
+      { "name": "stopToolSound", "summary": "Stops a specific tool's sound effect." },
+      { "name": "stopAllToolSounds", "summary": "Stops all currently playing tool sound effects." }
+    ],
+    "key_constants": {
+      "volume": "GameConfig.audio.volume (0.3)",
+      "backgroundMusicVolume": "GameConfig.audio.backgroundMusicVolume (0.3)"
+    },
+    "calculation_logic": "Volume is set directly from GameConfig. Sound playback is handled by the browser's HTMLAudioElement API.",
+    "dependencies": ["config.js", "utils.js"],
+    "exports": ["AudioManager"],
+    "notable_variables": ["audioElements", "isInitialized", "userInteracted", "backgroundMusicMuted"],
+    "verified_details": {
+      "initialization_flow": "The `initialize` method fetches audio elements from the DOM by their IDs ('paintSound', 'combSound', 'shaveSound', 'backgroundMusic'). It then calls `setupUserInteractionListener`, which adds a 'click' event listener to the document. This listener calls `playBackgroundMusic` on the first user interaction to comply with browser autoplay policies. The `preloadAudio` method can be called to start loading the audio files.",
+      "sound_mapping": {
+        "paint": "paintSound",
+        "addHair": "paintSound",
+        "comb": "combSound",
+        "shave": "shaveSound"
+      },
+      "volume_control": "Global sound effect volume is controlled by `setGlobalVolume`, which updates `GameConfig.audio.volume`. Background music volume is separately controlled by `setBackgroundMusicVolume`, which updates `GameConfig.audio.backgroundMusicVolume`. `muteAll()` and `unmuteAll()` toggle the `muted` property on all audio elements.",
+      "background_music_logic": "Handled by a combination of `playBackgroundMusic`, `stopBackgroundMusic`, `muteBackgroundMusic`, and `unmuteBackgroundMusic`. A `backgroundMusicMuted` flag tracks the state, which is toggled by `toggleBackgroundMusic`. Music only starts playing after a `userInteracted` flag is set to true.",
+      "state_and_cleanup": "The `getAudioStatus()` method returns a detailed object with the status of initialization, user interaction, and music playback. The `cleanup()` method stops all sounds and removes event listeners to prevent memory leaks."
+    }
+  },
+  {
+    "filename": "character-manager.js",
+    "purpose": "Manages character selection, switching between different avatars, and updating the game state to reflect the current character's properties (e.g., hair position, style).",
+    "main_functions": [
+      { "name": "CharacterManager", "summary": "Class constructor, initializes character state." },
+      { "name": "initialize", "summary": "Sets up DOM element references and event listeners for character switching." },
+      { "name": "setCharacter", "summary": "Switches to a specific character, updates the avatar image, and regenerates hair if needed." },
+      { "name": "toggleCharacter", "summary": "Switches between 'male' and 'female' characters." },
+      { "name": "clearAllHair", "summary": "Removes all existing hair from the canvas and the hair system." },
+      { "name": "preloadCharacterImages", "summary": "Preloads character avatar images to prevent delays during switching." }
+    ],
+    "key_constants": {
+      "defaultCharacter": "GameConfig.characters.default ('male')",
+      "toggleFeedbackAnimation": "'pulse 0.3s ease-in-out'",
+      "hairRegenDelay": "16 (ms)"
+    },
+    "calculation_logic": "Character switching involves updating `GameConfig.avatar` with the new character's `hairCenter` and `hairRadius`. Hair regeneration is triggered after a 16ms timeout to allow the canvas to clear.",
+    "dependencies": ["config.js", "hair-system.js", "physics.js"],
+    "exports": ["CharacterManager"],
+    "notable_variables": ["currentCharacter", "avatarImage", "hairSystem", "physicsEngine"],
+    "verified_details": {
+      "dependency_usage": "Requires `hairSystem` and `physicsEngine` to execute `clearAllHair`. This method calls `physicsEngine.clearAllFallingHair()` to stop animations and `hairSystem.hairStrands = []` to empty the hair data before regeneration.",
+      "state_update_logic": "The `setCharacter` method is critical. It directly modifies the global `GameConfig.avatar` object, updating `centerX`, `centerY`, and `hairRadius` based on the selected character's properties from `GameConfig.characters`. This change is then picked up by other modules, notably `hair-system.js` for hair generation.",
+      "hair_regeneration_flow": "When a character is changed, `clearAllHair` is called first. Then, after a 16ms `setTimeout` (to wait for one frame), `hairSystem.generateHair(characterId)` is called to draw the new hair based on the updated `GameConfig`.",
+      "ui_update_details": "The `updateUI` method changes the `textContent` of the character label, updates the CSS class on the `.character-selector` element to match the current character ('male' or 'female'), and updates the `title` attribute of the toggle button to indicate the next character."
+    }
+  },
+  {
+    "filename": "config.js",
+    "purpose": "A centralized file containing all constants and settings for the game. This includes canvas dimensions, avatar properties, hair generation parameters, physics settings, tool properties, UI styles, and audio volumes.",
+    "main_functions": [],
+    "key_constants": {
+      "canvas.width": 600,
+      "canvas.height": 600,
+      "avatar.centerX": 305,
+      "avatar.centerY": 220,
+      "avatar.hairRadius": 90,
+      "hair.defaultColor": "#8B4513",
+      "hair.lineWidth": 2,
+      "physics.fallSpeed.min": 2,
+      "physics.fallSpeed.max": 4,
+      "tools.paint.effectRadius": 30,
+      "tools.comb.influence": 0.3,
+      "tools.shave.effectRadius": 15,
+      "audio.volume": 0.3
+    },
+    "calculation_logic": "This file contains no calculation logic, only static configuration objects.",
+    "dependencies": [],
+    "exports": ["GameConfig"],
+    "notable_variables": ["GameConfig"],
+    "verified_details": {
+      "structure": "The file defines a single constant object, `GameConfig`. This object is organized into nested objects for each major system of the game: `canvas`, `avatar`, `hair`, `physics`, `tools`, `ui`, `audio`, `animation`, and `characters`.",
+      "character_specific_config": "The `characters` object contains detailed, character-specific overrides for hair generation. Each character (`male`, `female`) has its own `hairStyle` object with properties like `defaultColor`, `strandLength`, `curliness`, `wavePattern`, `waveAmplitude`, `waveFrequency`, `glossiness`, `highlightColor`, and `shadowColor`. This allows for unique hair styles without changing the core generation logic.",
+      "mutability": "While defined as a `const`, the properties of the `GameConfig` object are mutable. The `character-manager.js` module directly modifies `GameConfig.avatar.centerX`, `GameConfig.avatar.centerY`, and `GameConfig.avatar.hairRadius` at runtime when the character is switched."
+    }
+  },
+  {
+    "filename": "game.js",
+    "purpose": "The main game engine. It initializes and coordinates all other game systems (HairSystem, PhysicsEngine, AudioManager, etc.), manages the main game loop, and handles the overall game state.",
+    "main_functions": [
+      { "name": "HairSalonGame", "summary": "Main game class constructor." },
+      { "name": "initialize", "summary": "Initializes the canvas and all game systems in the correct order." },
+      { "name": "initializeSystems", "summary": "Instantiates all manager classes (AudioManager, HairSystem, etc.)." },
+      { "name": "generateInitialHair", "summary": "Calls the HairSystem to create the initial set of hair on the avatar." },
+      { "name": "reset", "summary": "Resets the game to its initial state, clearing all hair and resetting tools." }
+    ],
+    "key_constants": {
+      "gameVersion": "2.0.0"
+    },
+    "calculation_logic": "The `initialize` method follows a strict order of operations to ensure dependencies are met. The `reset` method demonstrates how to tear down and rebuild the game state.",
+    "dependencies": ["config.js", "utils.js", "hair-system.js", "physics.js", "audio-manager.js", "character-manager.js", "tools.js", "ui-controls.js"],
+    "exports": ["HairSalonGame"],
+    "notable_variables": ["hairSalonGame", "canvas", "ctx", "hairSystem", "physicsEngine", "audioManager", "toolManager", "uiController", "characterManager"],
+    "verified_details": {
+      "initialization_order": "The `initializeSystems` method follows a specific instantiation order to resolve dependencies: 1. `AudioManager` (no dependencies). 2. `HairSystem`. 3. `PhysicsEngine`. 4. `CharacterManager` (depends on HairSystem and PhysicsEngine). 5. `ToolManager` (depends on all of the above). 6. `UIController` (depends on ToolManager, AudioManager, CharacterManager).",
+      "global_instance": "A global instance of the game is created and assigned to `window.hairSalonGame` after successful initialization, allowing for debugging from the browser console. The script waits for the `DOMContentLoaded` event before starting.",
+      "error_handling": "The main `initialize` block is wrapped in a `try...catch` block. If an error occurs, `handleInitializationError` is called, which displays a user-friendly error message overlay on the screen.",
+      "lifecycle_management": "The game includes `pause`, `resume`, `reset`, and `cleanup` methods. A `beforeunload` event listener on the `window` ensures that `hairSalonGame.cleanup()` is called to release resources when the page is closed."
+    }
+  },
+  {
+    "filename": "hair-system.js",
+    "purpose": "Manages the generation, drawing, and manipulation of hair strands. It handles hair color, length, angle, and style, and provides methods for other modules to interact with the hair.",
+    "main_functions": [
+      { "name": "HairSystem", "summary": "Class constructor, initializes canvas context and hair strand array." },
+      { "name": "drawHairStrand", "summary": "Draws a single hair strand with optional wave and gloss effects." },
+      { "name": "generateHair", "summary": "Generates the initial set of hair for a given character type, creating layers for volume." },
+      { "name": "addHairAtPosition", "summary": "Adds new hair strands at a specific point, if within the valid hair zone." },
+      { "name": "paintHairAtPosition", "summary": "Changes the color of existing hair strands within a given radius." },
+      { "name": "shaveHairAtPosition", "summary": "Removes hair strands within a radius and returns them for the physics engine." },
+      { "name": "combHairAtPosition", "summary": "Adjusts the angle of hair strands to simulate combing." },
+      { "name": "redrawAllHair", "summary": "Clears the canvas and redraws all hair strands, respecting their layer depth." }
+    ],
+    "key_constants": {
+      "opacity": "0.6 + (layerDepth * 0.4)",
+      "lineWidth": "GameConfig.hair.lineWidth * (0.8 + layerDepth * 0.4)",
+      "shadowOffset": "1 * layerDepth",
+      "highlightOpacity": "waveConfig.glossiness * 0.5 * layerDepth"
+    },
+    "calculation_logic": "Hair generation uses concentric circles (`for (let radius = 0; ...)`). Hair combing uses linear interpolation: `strand.angle += (combAngle - strand.angle) * influence`. Drawing wavy hair uses sine functions for offset calculation: `Math.sin(progress * Math.PI * 2 * waveConfig.waveFrequency) * waveConfig.waveAmplitude`.",
+    "dependencies": ["config.js", "utils.js"],
+    "exports": ["HairSystem"],
+    "notable_variables": ["hairStrands", "ctx"],
+    "verified_details": {
+      "hair_generation_algorithm": "The `generateHair` method uses a sophisticated, multi-layered approach. It iterates through `volumeZones` and `layerDepths` defined in `GameConfig`. For each combination, it generates hair in concentric circles. The number of strands per circle is proportional to the radius (`radius * multiplier`). It adds randomness to angle, radius, and length to create a natural look. A separate loop adds a dense `centerFillStrands` at the very center.",
+      "hair_drawing_and_styling": "The `drawHairStrand` method is the core rendering function. It uses `layerDepth` to calculate opacity and line width, making back layers thinner and more transparent. If a `waveConfig` with `glossiness > 0` is provided, it calls `drawStrandShadow` and `drawStrandHighlight` to create a 3D effect. The actual strand is drawn using `drawSmoothStrand` (for straight hair) or `drawWavyStrand` (for wavy/curly).",
+      "wavy_and_curly_hair_logic": "`drawWavyStrand` calculates points along the strand's path. For 'wavy' hair, it uses a simple sine wave. For 'curly' hair, it uses a more complex formula with two sine waves (harmonics) to create a more irregular pattern: `(Math.sin(...) + Math.sin(...)*0.3) * amplitude`. It then uses `quadraticCurveTo` and `bezierCurveTo` to draw a smooth line through these points.",
+      "layering_and_redrawing": "The `redrawAllHair` method is crucial for maintaining visual integrity. It first sorts the `hairStrands` array based on `layerDepth` (from smallest to largest). It then iterates through the sorted array, drawing the back layers first, ensuring that front layers are rendered on top. This is essential after any operation that changes hair geometry, like combing.",
+      "boundary_check": "The `addHairAtPosition` method uses `Utils.isInHairZone(x, y)` to check if the action is valid. If this check fails, the method returns `false` and no hair is added, signaling to the `ToolManager` to provide negative feedback.",
+      "male_vs_female_differences": {
+        "male": {
+          "parameters": { "hairCenter": { "x": 305, "y": 220 }, "hairRadius": 90, "defaultColor": "#8B4513", "strandLength": { "min": 20, "max": 30 }, "curliness": 0, "wavePattern": "straight", "glossiness": 0.3 }
+        },
+        "female": {
+          "parameters": { "hairCenter": { "x": 305, "y": 210 }, "hairRadius": 85, "defaultColor": "#D2691E", "strandLength": { "min": 25, "max": 40 }, "curliness": 0.3, "wavePattern": "curly", "glossiness": 0.6, "waveAmplitude": 6, "waveFrequency": 0.8 }
+        }
+      }
+    }
+  },
+  {
+    "filename": "physics.js",
+    "purpose": "Handles the animation of falling hair particles. When hair is shaved, this engine takes the removed strands and animates them falling off the screen with rotation and drift.",
+    "main_functions": [
+      { "name": "PhysicsEngine", "summary": "Class constructor, initializes the falling hair array." },
+      { "name": "createFallingHair", "summary": "Creates a new falling hair particle from a hair strand object." },
+      { "name": "updateFallingHair", "summary": "Updates the position and rotation of all falling hair particles." },
+      { "name": "drawFallingHair", "summary": "Draws all falling hair particles on the canvas." },
+      { "name": "animationLoop", "summary": "The main animation loop that redraws the scene on each frame." }
+    ],
+    "key_constants": {
+      "rotationSpeed.min": "GameConfig.physics.rotationSpeed.min (-0.1)",
+      "rotationSpeed.max": "GameConfig.physics.rotationSpeed.max (0.1)",
+      "fallSpeed.min": "GameConfig.physics.fallSpeed.min (2)",
+      "fallSpeed.max": "GameConfig.physics.fallSpeed.max (4)",
+      "horizontalDrift.min": "GameConfig.physics.horizontalDrift.min (-0.5)",
+      "horizontalDrift.max": "GameConfig.physics.horizontalDrift.max (0.5)",
+      "fallingHairOpacity": "GameConfig.physics.fallingHairOpacity (0.8)",
+      "cleanupDistance": "GameConfig.physics.cleanupDistance (50)"
+    },
+    "calculation_logic": "Particle movement is updated each frame: `hair.y += hair.fallSpeed; hair.x += hair.horizontalDrift; hair.rotation += hair.rotationSpeed;`. Particles are removed when `hair.y > canvas.height + cleanupDistance`.",
+    "dependencies": ["config.js", "utils.js"],
+    "exports": ["PhysicsEngine"],
+    "notable_variables": ["fallingHair", "isAnimating", "animationId"],
+    "verified_details": {
+      "particle_creation": "The `createFallingHair` method converts a `hairStrand` object into a 'particle'. It copies properties like `baseX`, `baseY`, `length`, and `color`. It then adds physics-specific properties by generating random values for `rotationSpeed`, `fallSpeed`, and `horizontalDrift` using `Utils.randomBetween` and ranges from `GameConfig.physics`.",
+      "animation_loop_and_coordination": "The animation is driven by `requestAnimationFrame` within the `animationLoop` method. This loop is only started by the `ToolManager` when hair is shaved. Crucially, the `animationLoop` accepts a `redrawStaticHair` function as an argument. On each frame, it clears the entire canvas, calls `redrawStaticHair()` (which is `hairSystem.redrawAllHair`), and then updates and draws the falling particles on top. This ensures both static and dynamic elements are rendered correctly together.",
+      "particle_update_and_cleanup": "In `updateFallingHair`, each particle's `y` position is increased by `fallSpeed`, `x` by `horizontalDrift`, and `rotation` by `rotationSpeed`. A cleanup check runs in the same loop: `if (hair.y > this.canvas.height + GameConfig.physics.cleanupDistance)`, the particle is removed from the `fallingHair` array using `splice`.",
+      "animation_state_management": "The `isAnimating` flag controls the animation. It is set to `true` in `startAnimation`. The `animationLoop` will stop itself and set `isAnimating` to `false` if the `fallingHair` array becomes empty. `clearAllFallingHair` provides an emergency stop by emptying the array and calling `stopAnimation`."
+    }
+  },
+  {
+    "filename": "tools.js",
+    "purpose": "Manages all tool functionality, including handling mouse events on the canvas and delegating actions to the appropriate systems (HairSystem, PhysicsEngine, AudioManager).",
+    "main_functions": [
+      { "name": "ToolManager", "summary": "Class constructor, sets up event listeners." },
+      { "name": "setTool", "summary": "Changes the current active tool and updates the cursor." },
+      { "name": "handleMouseDown", "summary": "Handles the initial click, starting a tool action and playing sound." },
+      { "name": "handleMouseMove", "summary": "Handles mouse movement, continuing the tool action (e.g., painting, combing)." },
+      { "name": "executeToolAction", "summary": "A switch statement that calls the appropriate method based on `currentTool`." },
+      { "name": "shaveHair", "summary": "Calls HairSystem to remove hair and PhysicsEngine to animate it." }
+    ],
+    "key_constants": {
+      "combMovementThreshold": 1
+    },
+    "calculation_logic": "The comb tool calculates movement direction: `dx = pos.x - lastMouseX; dy = pos.y - lastMouseY;`. The `shaveHair` function orchestrates the interaction between `HairSystem` and `PhysicsEngine`.",
+    "dependencies": ["config.js", "utils.js", "hair-system.js", "physics.js", "audio-manager.js", "character-manager.js"],
+    "exports": ["ToolManager"],
+    "notable_variables": ["currentTool", "isMouseDown", "lastMouseX", "lastMouseY", "colorPicker"],
+    "verified_details": {
+      "event_handling": "The manager binds `mousedown`, `mousemove`, `mouseup`, and `mouseleave` listeners to the canvas. The `isMouseDown` flag is used to track when the user is dragging the mouse. `lastMouseX` and `lastMouseY` are used to calculate movement vectors for the comb tool.",
+      "tool_action_delegation": "The `executeToolAction` method is a central switch statement that delegates to more specific methods like `paintHair`, `addHair`, `combHair`, and `shaveHair`. These methods then call the appropriate system (e.g., `this.hairSystem.paintHairAtPosition(...)`).",
+      "comb_tool_logic": "The `combHair` method has dual functionality. If there is significant mouse movement (`Math.abs(dx) > 1 || Math.abs(dy) > 1`), it calls `hairSystem.combHairAtPosition` with the movement vector. If there is no movement, it simply draws a temporary visual effect (`drawCombEffect`).",
+      "shave_tool_orchestration": "The `shaveHair` method is a key example of orchestration. It first calls `hairSystem.shaveHairAtPosition` to get an array of `removedHair`. If this array is not empty, it passes the array to `physicsEngine.createMultipleFallingHair` and then calls `physicsEngine.initializeAnimation`, passing `hairSystem.redrawAllHair` as the callback function. This coordinates the two systems.",
+      "visual_feedback_logic": "When the 'addHair' tool is used outside the valid area, `hairSystem.addHairAtPosition` returns `false`. The `addHair` method in `ToolManager` detects this and calls `showInvalidAreaFeedback`. This method in turn calls `showBlinkingHairZone` (which uses a `setInterval` to toggle the guide's visibility) and draws a temporary red 'X' on the canvas.",
+      "out_of_bounds_feedback": {
+        "trigger": "Using the 'addHair' tool outside the boundary defined by `Utils.isInHairZone`.",
+        "icon_properties": { "shape": "A red 'X'", "position": "Centered at the mouse coordinates (x, y).", "size": "20x20 pixels", "color": "#ff4444", "lineWidth": 3, "opacity": 0.8 },
+        "animation": { "duration": 500, "behavior": "The 'X' icon appears instantly and is removed after 500ms." },
+        "blinking_boundary": { "strokeColor": "rgba(32, 201, 151, 0.3)", "lineWidth": 2, "dashPattern": [5, 5], "blinkCount": 4, "blinkInterval": 200 }
+      }
+    }
+  },
+  {
+    "filename": "ui-controls.js",
+    "purpose": "Handles user interface interactions, such as button clicks, color picking, and keyboard shortcuts. It acts as the bridge between the user and the ToolManager/AudioManager.",
+    "main_functions": [
+      { "name": "UIController", "summary": "Class constructor, initializes UI elements and event listeners." },
+      { "name": "handleToolClick", "summary": "Called when a tool button is clicked, sets the tool in ToolManager." },
+      { "name": "updateButtonStates", "summary": "Updates the visual state of tool buttons to show which is active." },
+      { "name": "takeScreenshot", "summary": "Captures the current state of the game canvas and triggers a download." },
+      { "name": "toggleBackgroundMusic", "summary": "Toggles the background music and updates the button's appearance." },
+      { "name": "setupKeyboardShortcuts", "summary": "Maps keyboard keys (p, a, c, s, m, x) to game actions." }
+    ],
+    "key_constants": {
+      "screenshotFeedbackAnimation": "'pulse 0.3s ease-in-out'",
+      "screenshotFailureAnimation": "'shake 0.3s ease-in-out'"
+    },
+    "calculation_logic": "Screenshot logic involves creating a temporary canvas and drawing the background, table, avatar, and hair canvas in order to create a composite image. Keyboard shortcuts are handled via a `keydown` event listener with a switch statement.",
+    "dependencies": ["config.js", "tools.js", "audio-manager.js", "character-manager.js"],
+    "exports": ["UIController"],
+    "notable_variables": ["toolManager", "audioManager", "characterManager", "colorPicker", "buttons"],
+    "verified_details": {
+      "event_listener_setup": "The `initialize` method calls `setupElements` to get references to all buttons and the color picker from the DOM. It then calls `setupEventListeners` which binds 'click' handlers to each button and a 'change' handler to the color picker. It also calls `setupKeyboardShortcuts`.",
+      "keyboard_shortcuts": "The `setupKeyboardShortcuts` method adds a single `keydown` event listener to the document. It uses a `switch` statement on `event.key.toLowerCase()` to map keys to actions: 'p' (paint), 'a' (addHair), 'c' (comb), 's' (shave), ' ' (screenshot), 'm' (mute), and 'x' (character switch). It checks `event.target.tagName` to avoid firing when typing in an input field.",
+      "screenshot_logic": "The `takeScreenshot` method creates a new, temporary canvas in memory. It then draws the game elements in order from back to front: 1. Background image. 2. Table image. 3. Avatar image. 4. The main `hairCanvas`. This creates a composite image. Finally, it converts the temporary canvas to a PNG data URL (`tempCanvas.toDataURL('image/png')`) and creates a temporary `<a>` link to trigger a download.",
+      "button_state_management": "`updateButtonStates` manages the 'active-tool' class on the tool buttons, ensuring only the currently selected tool is highlighted. `updateSoundToggleButton` manages the 'muted' class and swaps the visibility of the 'soundOnIcon' and 'soundOffIcon' elements.",
+      "feedback_animations": "Visual feedback for actions like taking a screenshot or toggling sound is provided by adding a temporary CSS animation (e.g., `style.animation = 'pulse 0.3s ease-in-out'`) and then removing it in a `setTimeout` callback."
+    }
+  },
+  {
+    "filename": "utils.js",
+    "purpose": "A collection of static helper functions used throughout the game for common tasks like calculating distance, getting mouse position, generating random numbers, and checking if a point is within the valid hair zone.",
+    "main_functions": [
+      { "name": "getMousePosition", "summary": "Calculates mouse coordinates relative to the canvas." },
+      { "name": "calculateDistance", "summary": "Calculates the Euclidean distance between two points." },
+      { "name": "isInHairZone", "summary": "Checks if a point is within the semi-circular hair zone on the avatar's head." },
+      { "name": "randomBetween", "summary": "Generates a random floating-point number in a given range." },
+      { "name": "clamp", "summary": "Constrains a value to be within a specified range." }
+    ],
+    "key_constants": {},
+    "calculation_logic": "`isInHairZone` uses the distance formula and also checks `y <= centerY` to confirm the point is in the top half of the circle. `calculateDistance` uses `Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))`. `lerp` is `a + (b - a) * t`.",
+    "dependencies": ["config.js"],
+    "exports": ["Utils"],
+    "notable_variables": [],
+    "verified_details": {
+      "class_structure": "This file defines a class named `Utils` with only `static` methods. This means it does not need to be instantiated; its methods are called directly on the class, e.g., `Utils.calculateDistance(...)`.",
+      "getMousePosition_logic": "This method gets the canvas's bounding rectangle (`canvas.getBoundingClientRect()`). It then subtracts the rectangle's `left` and `top` properties from the event's `clientX` and `clientY` to get coordinates relative to the canvas, accounting for page scrolling and canvas position.",
+      "isInHairZone_logic": "This is a critical boundary check. It first calculates the distance of the point (x, y) from the avatar's center (`GameConfig.avatar.centerX`, `GameConfig.avatar.centerY`). It then returns `true` only if two conditions are met: 1. `distance <= GameConfig.avatar.hairRadius` (the point is inside the circle). 2. `y <= GameConfig.avatar.centerY` (the point is in the top half of the circle, forming a semi-circle).",
+      "provided_utilities": "The class provides a standard set of game development utilities: `getMousePosition`, `calculateDistance`, `isInHairZone`, `randomBetween` (float), `randomIntBetween` (integer), `degreesToRadians`, `radiansToDegrees`, `clamp`, `lerp`, `findHairStrandsInRadius`, and `debounce`."
+    }
+  }
+]

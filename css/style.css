@@ -1,0 +1,398 @@
+/* Hair Salon Styles - Complete CSS Configuration */
+
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Game Container - Main Canvas Area */
+.game-container {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    margin: 0 auto;
+    border: 2px solid #333;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* Background Image */
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Table Image */
+.table-image {
+    position: absolute;
+    bottom: -340px;
+    right: -50px;
+    width: 695px;
+    height: auto;
+    z-index: 2;
+    overflow: hidden;
+}
+
+/* Avatar Images */
+.avatar-image {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 680px;
+    height: auto;
+    z-index: 3;
+    transition: all 0.3s ease;
+}
+
+/* Character-specific avatar positioning */
+.avatar-image.male {
+    bottom: 100px;
+    width: 680px;
+    transform: translateX(-50%);
+}
+
+.avatar-image.female {
+    bottom: 90px;
+    width: 320px;
+    transform: translateX(-50%);
+}
+
+/* Hair Canvas */
+#hairCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+    pointer-events: auto;
+}
+
+/* Sound Toggle Button */
+.sound-toggle-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 12px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #6c757d, #495057);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    z-index: 10;
+}
+
+.sound-toggle-btn:hover {
+    background: linear-gradient(145deg, #495057, #343a40);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(108, 117, 125, 0.4);
+}
+
+.sound-toggle-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
+}
+
+.sound-toggle-btn svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+    transition: transform 0.2s ease;
+}
+
+.sound-toggle-btn:hover svg {
+    transform: scale(1.1);
+}
+
+/* Muted state styling */
+.sound-toggle-btn.muted {
+    background: linear-gradient(145deg, #dc3545, #c82333);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.sound-toggle-btn.muted:hover {
+    background: linear-gradient(145deg, #c82333, #a71e2a);
+    box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+}
+
+/* Character Selector */
+.character-selector {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 12px;
+    border-radius: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.character-toggle-btn {
+    padding: 8px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #007bff, #0056b3);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+}
+
+.character-toggle-btn:hover {
+    background: linear-gradient(145deg, #0056b3, #004494);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+}
+
+.character-toggle-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.character-toggle-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    transition: transform 0.2s ease;
+}
+
+.character-toggle-btn:hover svg {
+    transform: scale(1.1);
+}
+
+.character-label {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    min-width: 45px;
+    text-align: center;
+}
+
+/* Female character styling */
+.character-selector.female .character-toggle-btn {
+    background: linear-gradient(145deg, #e91e63, #c2185b);
+    box-shadow: 0 2px 6px rgba(233, 30, 99, 0.3);
+}
+
+.character-selector.female .character-toggle-btn:hover {
+    background: linear-gradient(145deg, #c2185b, #ad1457);
+    box-shadow: 0 4px 8px rgba(233, 30, 99, 0.4);
+}
+
+/* Controls Panel */
+.controls-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    min-width: 120px;
+}
+
+.controls-panel button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(145deg, #007bff, #0056b3);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.controls-panel button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.controls-panel button:hover::before {
+    left: 100%;
+}
+
+.controls-panel button svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+    transition: transform 0.2s ease;
+    z-index: 1;
+}
+
+.controls-panel button:hover {
+    background: linear-gradient(145deg, #0056b3, #004494);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
+}
+
+.controls-panel button:hover svg {
+    transform: scale(1.1);
+}
+
+.controls-panel button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+/* Individual Button Styling */
+#shaveBtn {
+    background: linear-gradient(145deg, #dc3545, #c82333);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+#shaveBtn:hover {
+    background: linear-gradient(145deg, #c82333, #a71e2a);
+    box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+}
+
+#combBtn {
+    background: linear-gradient(145deg, #28a745, #218838);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+#combBtn:hover {
+    background: linear-gradient(145deg, #218838, #1e7e34);
+    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
+}
+
+#paintBtn {
+    background: linear-gradient(145deg, #fd7e14, #e8590c);
+    box-shadow: 0 4px 8px rgba(253, 126, 20, 0.3);
+}
+
+#paintBtn:hover {
+    background: linear-gradient(145deg, #e8590c, #d54d09);
+    box-shadow: 0 6px 12px rgba(253, 126, 20, 0.4);
+}
+
+#screenshotBtn {
+    background: linear-gradient(145deg, #6f42c1, #5a32a3);
+    box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3);
+}
+
+#screenshotBtn:hover {
+    background: linear-gradient(145deg, #5a32a3, #4a2c85);
+    box-shadow: 0 6px 12px rgba(111, 66, 193, 0.4);
+}
+
+#addHairBtn {
+    background: linear-gradient(145deg, #20c997, #17a085);
+    box-shadow: 0 4px 8px rgba(32, 201, 151, 0.3);
+}
+
+#addHairBtn:hover {
+    background: linear-gradient(145deg, #17a085, #138973);
+    box-shadow: 0 6px 12px rgba(32, 201, 151, 0.4);
+}
+
+/* Hair Color Picker */
+#hairColor {
+    width: 48px;
+    height: 48px;
+    border: 3px solid #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+#hairColor:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Custom Cursor Styles for Different Tools */
+.cursor-paint {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23000" d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>') 12 12, auto;
+}
+
+.cursor-comb {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23000" d="M8 2v4H6V2h2m2 0v4h-1V2h1m2 0v4h-1V2h1m2 0v4h-1V2h1m2 0v4h-1V2h1m2 0v4h-1V2h1M6 8v14h12V8H6z"/></svg>') 12 12, auto;
+}
+
+.cursor-shave {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23000" d="M22 4.73L19.27 2L17 4.27l2.73 2.73L22 4.73M15.73 7L17 5.73L18.27 7L17 8.27L15.73 7M8.5 10.5L5 14l1.5 1.5l3.5-3.5L8.5 10.5M12 12L9 15l1.5 1.5l3-3L12 12M15.5 15.5L12 19l1.5 1.5l3.5-3.5L15.5 15.5z"/></svg>') 12 12, auto;
+}
+
+.cursor-addhair {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23000" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>') 12 12, auto;
+}
+
+/* Active Tool Styling */
+.controls-panel button.active-tool {
+    background: linear-gradient(145deg, #ffd700, #ffb700) !important;
+    box-shadow: 0 6px 12px rgba(255, 215, 0, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+.controls-panel button.active-tool svg {
+    color: #333;
+    transform: scale(1.1);
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Audio Elements (hidden) */
+audio {
+    display: none;
+}
